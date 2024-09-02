@@ -9,6 +9,7 @@ import ar.edu.unlu.uno.modelo.PozoDescarte;
 
 public abstract class Carta implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private Colores color;
 
 	public Carta(Colores color) {
@@ -19,10 +20,17 @@ public abstract class Carta implements Serializable{
 		return this.color;
 	}
 	
+	 /**
+     * Verifica si la carta puede ser jugada en el pozo de descarte actual
+     * @param pozo El pozo de descarte donde se va a jugar la carta
+     * @return true si la carta es válida para jugar, false en caso contrario
+     */
 	public boolean esJugadaValida(PozoDescarte pozo) { 
-		if (!pozo.verTope().tieneColor() && this.color.equals(pozo.getColorPartida())) // Si es un comodin de cambio de color (no tiene color) y coincide con el color de la partida
+		//Si el pozo contiene un comodin de cambio de color (No tiene color) AND coincide con el color de la partida
+		if (!pozo.verTope().tieneColor() && this.color.equals(pozo.getColorPartida())) 
 			return true;
-		if (this.nombre().equals(pozo.verTope().nombre()) || this.color.equals(pozo.getColorPartida())) //Si es del mismo tipo o color
+		//Si es del mismo tipo o color
+		if (this.nombre().equals(pozo.verTope().nombre()) || this.color.equals(pozo.getColorPartida())) 
 			return true;
 		return false;
 	}

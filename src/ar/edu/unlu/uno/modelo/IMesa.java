@@ -11,13 +11,13 @@ public interface IMesa extends IObservableRemoto{
 
 	void repartir(int idJugador, int n) throws RemoteException;
 
-	void robarParaJugador(int IdJugador) throws RemoteException;
+	boolean robarParaJugador(int IdJugador) throws RemoteException;
 
 	void reiniciarPozo() throws RemoteException;
 
 	void agregarCartasExtra(int idJugador) throws RemoteException;
 
-	void descartarCarta(int idJugador, int iCarta) throws RemoteException;
+	boolean descartarCarta(int idJugador, int iCarta) throws RemoteException;
 
 	void descartarTurno(int idJugador) throws RemoteException;
 
@@ -27,7 +27,7 @@ public interface IMesa extends IObservableRemoto{
 
 	ManejadorTurnos getManejadorTurnos() throws RemoteException;
 
-	ArrayList<Jugador> getListaJugadores() throws RemoteException;
+	ArrayList<Jugador> getJugadores() throws RemoteException;
 
 	MazoPrincipal getMazoPrincipal() throws RemoteException;
 
@@ -36,5 +36,10 @@ public interface IMesa extends IObservableRemoto{
 	Jugador getJugador(int i) throws RemoteException;
 
 	String imprimirTablaPuntuaciones() throws RemoteException;
+	
+	void cambiarColorPartida(Colores color) throws RemoteException;
+
+	void comenzarJuego(int idJugador) throws RemoteException;
+
 
 }

@@ -9,16 +9,19 @@ import ar.edu.unlu.uno.modelo.PozoDescarte;
 
 public class CartaCambioDireccion extends Carta {
 
+	private static final long serialVersionUID = 1L;
+
 	public CartaCambioDireccion(Colores color) {
 		super(color);
 	}
 
 	@Override
 	public void aplicarEfecto(Mesa mesa, int idJugador) throws RemoteException {
-		mesa.getMazoPrincipal().setPuedeRobar(true);
-		mesa.getManejadorTurnos().cambiarSentido();
 		mesa.agregarCartasExtra(idJugador);
-//		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		mesa.getManejadorTurnos().cambiarSentido();
+		mesa.getMazoPrincipal().setPuedeRobar(true);
+		mesa.getManejadorTurnos().siguienteTurno();
+		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
 	}
 
 

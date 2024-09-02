@@ -2,7 +2,7 @@ package ar.edu.unlu.uno.modelo;
 
 import java.io.Serializable;
 
-public enum Colores implements Serializable{
+public enum Colores implements Serializable {
 	AZUL("AZUL"), ROJO("ROJO"), AMARILLO("AMARILLO"), VERDE("VERDE"), SIN_COLOR("");
 
 	private final String valor;

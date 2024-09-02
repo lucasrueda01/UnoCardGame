@@ -9,6 +9,7 @@ import ar.edu.unlu.uno.modelo.PozoDescarte;
 
 public class CartaNormal extends Carta {
 
+	private static final long serialVersionUID = 1L;
 	private int numero; // (0-9)
 
 	public CartaNormal(Colores color, int numero) {
@@ -30,7 +31,7 @@ public class CartaNormal extends Carta {
 			return true;
 		return false;
 	}
-
+ 
 	private boolean esCompatible(CartaNormal c) {
 		return (this.numero == c.getNumero() || this.getColor().equals(c.getColor())); // Comparo dos cartas normales
 	}
@@ -39,7 +40,8 @@ public class CartaNormal extends Carta {
 	public void aplicarEfecto(Mesa mesa, int idJugador) throws RemoteException {
 		mesa.getMazoPrincipal().setPuedeRobar(true);
 		mesa.agregarCartasExtra(idJugador);
-//		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		mesa.getManejadorTurnos().siguienteTurno();
+		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
 	}
 
 	@Override

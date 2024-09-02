@@ -1,12 +1,13 @@
 package ar.edu.unlu.uno.modelo;
 
-import java.io.Serializable;
 import java.util.Stack;
-
+import java.io.Serializable;
+import java.util.EmptyStackException;
 import ar.edu.unlu.uno.modelo.carta.Carta;
 
-public abstract class Pila implements Serializable{
+public abstract class Pila implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	protected Stack<Carta> pilaCartas;
 
 	public Pila() {
@@ -14,7 +15,9 @@ public abstract class Pila implements Serializable{
 	}
 
 	public Carta sacar() {
-		return pilaCartas.pop();
+	    if (this.estaVacia()) 
+	        throw new EmptyStackException(); 
+	    return pilaCartas.pop();
 	}
 
 	public boolean estaVacia() {
@@ -22,6 +25,6 @@ public abstract class Pila implements Serializable{
 	}
 
 	public void agregar(Carta c) {
-		pilaCartas.add(c);
+		pilaCartas.push(c);
 	}
 }

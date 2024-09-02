@@ -5,7 +5,8 @@ import java.util.ArrayList;
 
 import ar.edu.unlu.uno.modelo.carta.Carta;
 
-public class Jugador implements Serializable{
+public class Jugador implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String nombre;
 	private int id;
 	private ArrayList<Carta> mano;
@@ -17,6 +18,39 @@ public class Jugador implements Serializable{
 		mano = new ArrayList<Carta>();
 		this.puntaje = 0;
 	}
+
+	public void tomarCarta(Carta c) {
+		mano.add(c);
+	}
+
+	public Carta jugarCarta(int i) {
+		if (i < 0 || i >= mano.size()) {
+			throw new IndexOutOfBoundsException("Indice de carta invalido");
+		}
+		return mano.remove(i);
+	}
+
+	public Carta getCarta(int i) {
+		return mano.get(i);
+	}
+
+	public void sumarPuntos(int puntos) {
+		this.puntaje += puntos;
+	}
+
+	public String mostrarMano() {
+		String s = "-------------------------Mano de " + this.nombre + "----------------------------\n";
+		for (int i = 0; i < this.mano.size(); i++)
+			s = s + ((i + 1) + ". [" + this.getCarta(i) + "]\n");
+		s = s + "------------------------------------------------------------------------------------";
+		return s;
+	}
+
+	public boolean esGanador() {
+		return this.mano.size() == 0;
+	}
+
+	// Getters y Setters
 
 	public String getNombre() {
 		return nombre;
@@ -38,31 +72,4 @@ public class Jugador implements Serializable{
 		return mano;
 	}
 
-	public void tomarCarta(Carta c) {
-		mano.add(c);
-	}
-
-	public Carta jugarCarta(int i) {
-		return mano.remove(i);
-	}
-
-	public Carta getCarta(int i) {
-		return mano.get(i);
-	}
-
-	public void sumarPuntos(int puntos) {
-		this.puntaje += puntos;
-	}
-	
-	public boolean esGanador() {
-		return this.mano.size() == 0;
-	}
-	
-	public String mostrarMano() {
-		String s = "-------------------------Mano de " + this.nombre + "----------------------------\n";
-		for (int i = 0; i < this.mano.size(); i++) 
-			s = s + ((i + 1) + ". [" + this.getCarta(i) + "]\n");
-		s = s + "----------------------------------------------------------";
-		return s;
-	}
 }

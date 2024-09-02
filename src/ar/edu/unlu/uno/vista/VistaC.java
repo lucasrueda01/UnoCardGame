@@ -1,4 +1,5 @@
-//package ar.edu.unlu.uno.vista;
+// Vista consola usando la consola primitiva 
+//package ar.edu.unlu.uno.vista.VistaConsolaPrimitiva;
 //
 //import java.util.Scanner;
 //import java.util.concurrent.TimeUnit;
@@ -177,3 +178,5 @@
 //		System.out.println();
 //	}
 //}
+package ar.edu.unlu.uno.vista;
+

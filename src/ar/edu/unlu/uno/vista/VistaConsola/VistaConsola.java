@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -18,6 +17,7 @@ import ar.edu.unlu.uno.vista.IVista;
 
 public class VistaConsola extends JFrame implements IVista {
 
+	private static final long serialVersionUID = 1L;
 	private JTextArea textArea;
 	private JTextField inputField;
 	private int clienteID;
@@ -25,11 +25,11 @@ public class VistaConsola extends JFrame implements IVista {
 	private Controlador controlador;
 	private Estados estado;
 
-	public VistaConsola() {
+	public VistaConsola(int x, int y) {
 		setTitle("UNO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
-		setSize(600, 400);
+		setSize(600, 500);
 
 		textArea = new JTextArea();
 		textArea.setEditable(false);
@@ -52,6 +52,7 @@ public class VistaConsola extends JFrame implements IVista {
 
 		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
 		getContentPane().add(inputField, BorderLayout.SOUTH);
+		setLocation(x, y);
 		setVisible(true);
 		this.estado = Estados.AGREGAR_JUGADOR;
 		this.iniciar();
@@ -69,7 +70,7 @@ public class VistaConsola extends JFrame implements IVista {
 			break;
 		case AGREGAR_JUGADOR:
 			this.clienteID = this.controlador.agregarJugador(inputText);
-			setTitle("UNO - " + inputText);
+			setTitle("UNO - " + inputText + " (J" + (this.clienteID + 1) + ")");
 			this.volverAlMenuPrincipal();
 			break;
 		case JUEGO:
@@ -86,7 +87,6 @@ public class VistaConsola extends JFrame implements IVista {
 			if (Integer.parseInt(inputText) >= 1 && Integer.parseInt(inputText) <= 4) {
 				this.controlador.cambiarColor(Colores.values()[Integer.parseInt(inputText) - 1]);
 				this.estado = Estados.JUEGO;
-				this.controlador.descartarTurno(clienteID);
 				this.procesarInput(inputText);
 			}
 			break;
@@ -102,6 +102,7 @@ public class VistaConsola extends JFrame implements IVista {
 		switch (opcion) {
 		case "1":
 			if (this.controlador.haySuficientesJugadores()) {
+				this.controlador.notificarComienzo(this.clienteID);
 				this.estado = Estados.JUEGO;
 				this.procesarInput(opcion);
 			} else {
@@ -125,7 +126,7 @@ public class VistaConsola extends JFrame implements IVista {
 	}
 
 	public void mostrarMenuPrincipal() {
-		textArea.setText("########################  UNO  #############################\n" + "\n"
+		textArea.setText("###########################  UNO  ###############################\n" + "\n"
 				+ "Selecciona una opcion:\n" + "1. Comenzar UNO\n" + "2. Tabla de puntuaciones\n" + "0. Salir\n");
 	}
 
@@ -165,7 +166,10 @@ public class VistaConsola extends JFrame implements IVista {
 		if (IDjugador == this.clienteID) {
 			int numero = Integer.parseInt(inputText);
 			if ((numero >= 1) && (numero <= this.controlador.tamañoManoJugador())) {
-				this.controlador.descartarCarta(IDjugador, numero - 1);
+				if (!this.controlador.descartarCarta(IDjugador, numero - 1)) {
+					this.imprimirCartel("-ERROR... Carta incompatible-");
+					return;
+				};
 				if (this.estado.equals(Estados.ELIGIENDO_COLOR))
 					return;
 				this.estado = Estados.JUEGO;
@@ -195,7 +199,8 @@ public class VistaConsola extends JFrame implements IVista {
 	}
 
 	public void mostrarGanador(int IDjugador) throws RemoteException {
-		this.controlador.calcularPuntaje(IDjugador);
+		inputField.setEnabled(true);
+		this.estado = Estados.GANADOR;
 		textArea.setText(this.controlador.getJugador(IDjugador).getNombre() + " ha ganado con "
 				+ this.controlador.getJugador(IDjugador).getPuntaje() + " puntos! Felicidades!!");
 		this.imprimirCartel("0. VOLVER");
@@ -212,7 +217,14 @@ public class VistaConsola extends JFrame implements IVista {
 			this.estado = Estados.ELIGIENDO_COLOR;
 			textArea.setText("1. AZUL\n2. ROJO\n3. AMARILLO\n4. VERDE");
 			this.imprimirCartel("Elija un nuevo color: ");
+		} else {
+			this.imprimirCartel("-El jugador esta eligiendo color-");
 		}
+	}
+
+	@Override
+	public void mostrar(String s) {
+		textArea.append("\n" + s);
 	}
 
 	@Override
@@ -220,9 +232,12 @@ public class VistaConsola extends JFrame implements IVista {
 		this.controlador = controlador;
 	}
 
-	@Override
-	public void mostrar(String s) {
-		textArea.append("\n" + s);
+	public void setEstado(Estados estado) {
+		this.estado = estado;
+	}
+
+	public Estados getEstado() {
+		return this.estado;
 	}
 
 }

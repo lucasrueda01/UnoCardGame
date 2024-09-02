@@ -9,9 +9,10 @@ import ar.edu.unlu.uno.modelo.PozoDescarte;
 
 public class CartaSaltoTurno extends Carta {
 
+	private static final long serialVersionUID = 1L;
+
 	public CartaSaltoTurno(Colores color) {
 		super(color);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -19,7 +20,8 @@ public class CartaSaltoTurno extends Carta {
 		mesa.getMazoPrincipal().setPuedeRobar(true);
 		mesa.getManejadorTurnos().setSalteaTurno(true);
 		mesa.agregarCartasExtra(idJugador);
-//		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		mesa.getManejadorTurnos().siguienteTurno();
+		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
 	}
 
 	@Override

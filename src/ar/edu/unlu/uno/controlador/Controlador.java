@@ -7,12 +7,8 @@ import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import ar.edu.unlu.uno.modelo.Colores;
 import ar.edu.unlu.uno.modelo.Eventos;
 import ar.edu.unlu.uno.modelo.Jugador;
-import ar.edu.unlu.uno.modelo.Mesa;
 import ar.edu.unlu.uno.modelo.IMesa;
-import ar.edu.unlu.uno.observer.Observable;
-import ar.edu.unlu.uno.observer.Observador;
 import ar.edu.unlu.uno.vista.IVista;
-//import ar.edu.unlu.uno.vista.VistaC;
 
 public class Controlador implements IControladorRemoto {
 	private IMesa modelo;
@@ -24,7 +20,7 @@ public class Controlador implements IControladorRemoto {
 
 	public boolean haySuficientesJugadores() throws RemoteException {
 		try {
-			return this.modelo.getListaJugadores().size() > 1;
+			return this.modelo.getJugadores().size() > 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -113,11 +109,12 @@ public class Controlador implements IControladorRemoto {
 		}
 	}
 
-	public void descartarCarta(int idJugador, int iCarta) throws RemoteException {
+	public boolean descartarCarta(int idJugador, int iCarta) throws RemoteException {
 		try {
-			this.modelo.descartarCarta(idJugador, iCarta);
+			return this.modelo.descartarCarta(idJugador, iCarta);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -137,15 +134,6 @@ public class Controlador implements IControladorRemoto {
 		}
 	}
 
-	public int calcularPuntaje(int idJugador) throws RemoteException {
-		try {
-			return this.modelo.calcularPuntajeFinal(idJugador);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
-	}
-
 	public Jugador getJugador(int id) throws RemoteException {
 		try {
 			return this.modelo.getJugador(id);
@@ -154,49 +142,54 @@ public class Controlador implements IControladorRemoto {
 			return null;
 		}
 	}
+	
+	public void notificarComienzo(int idJugador) throws RemoteException {
+		try {
+			this.modelo.comenzarJuego(idJugador);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void cambiarColor(Colores color) throws Exception {
 		try {
-			this.modelo.getPozoDescarte().setColorPartida(color);
+			this.modelo.cambiarColorPartida(color);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	
 	//Metodos de Observer
-
 	@Override
 	public void actualizar(IObservableRemoto modelo, Object cambio) throws RemoteException {
-		switch ((Eventos) cambio) {
-		case JUGADOR_AGREGADO:
-			// this.vista.imprimirCartel("-Jugador agregado!-");
-			break;
-		case CARTA_INVALIDA:
-			// this.vista.imprimirCartel("-ERROR... Carta incompatible-");
-			break;
-		case CAMBIO_TURNO:
-			try {
-				this.vista.jugar();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			break;
-		case CAMBIAR_COLOR:
-			try {
-				this.vista.elegirNuevoColor();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			break;
-		default:
-			break;
-		}
-
+	    try {
+	        switch ((Eventos) cambio) {
+	            case JUGADOR_AGREGADO:
+	            	String cartel = "-Jugador " + this.modelo.getJugadores().size() + " se unió!-";
+	                this.vista.imprimirCartel(cartel);
+	                break;
+	            case CAMBIO_TURNO:
+	                this.vista.jugar();
+	                break;
+	            case CAMBIAR_COLOR:
+	                this.vista.elegirNuevoColor();
+	                break;
+	            case GANADOR:
+	            	this.vista.mostrarGanador(this.jugadorTurnoActual().getId());
+	            default:
+	                break;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
+
 
 	@Override
 	public <T extends IObservableRemoto> void setModeloRemoto(T modeloRemoto) throws RemoteException {
 		this.modelo = (IMesa) modeloRemoto;
 	}
+
 
 }

@@ -9,16 +9,19 @@ import ar.edu.unlu.uno.modelo.PozoDescarte;
 
 public class CartaRobaDos extends Carta {
 
+	private static final long serialVersionUID = 1L;
+
 	public CartaRobaDos(Colores color) {
 		super(color);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void aplicarEfecto(Mesa mesa, int idJugador) throws RemoteException {
 		mesa.getPozoDescarte().agregarCartasExtra(2);
-		mesa.getMazoPrincipal().setPuedeRobar(false); //si hay cartas extras acumuladas el siguiente turno no puedo robar del mazo
-//		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		//si hay cartas extras acumuladas el siguiente turno no podra robar del mazo
+		mesa.getMazoPrincipal().setPuedeRobar(false); 
+		mesa.getManejadorTurnos().siguienteTurno();
+		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
 	}
 
 	@Override

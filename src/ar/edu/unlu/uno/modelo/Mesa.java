@@ -8,8 +8,10 @@ import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 import ar.edu.unlu.uno.modelo.carta.Carta;
 import ar.edu.unlu.uno.modelo.carta.CartaNormal;
 
-public class Mesa extends ObservableRemoto implements IMesa, Serializable{
+public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private MazoPrincipal mazoPrincipal;
 	private PozoDescarte pozoDescarte;
 	private ArrayList<Jugador> jugadores; // cada Jugador se identifica por su indice en el array
@@ -29,36 +31,71 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable{
 		Jugador j = new Jugador(nombre, jugadores.size());
 		jugadores.add(j);
 		this.repartir(j.getId(), cartasIniciales);
-		notificarObservadores(Eventos.JUGADOR_AGREGADO);
+		this.notificarObservadores(Eventos.JUGADOR_AGREGADO);
 		return j.getId();
 	}
 
 	@Override
-	public void repartir(int idJugador, int n) throws RemoteException{
+	public Jugador getJugador(int i) throws RemoteException {
+		return jugadores.get(i);
+	}
+
+	@Override
+	/**
+	 * Establece el jugador que comienza y actualiza las vistas para comenzar el
+	 * juego
+	 *
+	 */
+	public void comenzarJuego(int idJugador) throws RemoteException {
+		this.getManejadorTurnos().setTurnoActual(idJugador);
+		this.notificarObservadores(Eventos.CAMBIO_TURNO);
+	}
+
+	/**
+	 * Reparte N cantidad de cartas a un Jugador
+	 *
+	 */
+	@Override
+	public void repartir(int idJugador, int n) throws RemoteException {
 		for (int i = 0; i < n; i++)
 			jugadores.get(idJugador).tomarCarta(mazoPrincipal.sacar());
 	}
 
+	/**
+	 * Roba una carta del pozo si el jugador esta habilitado
+	 * 
+	 * @param idJugador del jugador que obtendra la carta
+	 * @return true si pudo ser robada, de lo contrario false
+	 */
 	@Override
-	public void robarParaJugador(int IdJugador) throws RemoteException{
+	public boolean robarParaJugador(int idJugador) throws RemoteException {
 		if (this.mazoPrincipal.puedeRobar()) {
-			this.getJugador(IdJugador).tomarCarta(this.mazoPrincipal.sacar());
+			this.getJugador(idJugador).tomarCarta(this.mazoPrincipal.sacar());
 			this.mazoPrincipal.setPuedeRobar(false);
 			if (this.mazoPrincipal.estaVacia())
 				this.reiniciarPozo();
+			return true;
 		}
+		return false;
 	}
 
+	/**
+	 * Reinicia y mezcla el pozo de descarte en caso de que la pila de cartas este
+	 * vacia
+	 */
 	@Override
-	public void reiniciarPozo() throws RemoteException{
+	public void reiniciarPozo() throws RemoteException {
 		while (!this.pozoDescarte.estaVacia())
 			this.mazoPrincipal.agregar(this.pozoDescarte.sacar());
 		this.mazoPrincipal.mezclar();
 		this.pozoDescarte.agregar(this.mazoPrincipal.sacar());
 	}
 
+	/**
+	 * Aplica la penalizacion de cartas extra a un jugador
+	 */
 	@Override
-	public void agregarCartasExtra(int idJugador) throws RemoteException{
+	public void agregarCartasExtra(int idJugador) throws RemoteException {
 		int cartasExtra = this.pozoDescarte.getCartasExtra();
 		while (cartasExtra > 0) {
 			this.getJugador(idJugador).tomarCarta(this.mazoPrincipal.sacar());
@@ -67,30 +104,56 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable{
 		this.pozoDescarte.setCartasExtra(0);
 	}
 
+	/**
+	 * Juega una carta especifica de un jugador si la jugada es valida
+	 * 
+	 * @param idJugador del jugador que jugara la carta
+	 * @param iCarta    del indice de la carta en la mano del jugador
+	 * @return true si pudo ser jugada, de lo contrario false
+	 */
 	@Override
-	public void descartarCarta(int idJugador, int iCarta) throws RemoteException {
+	public boolean descartarCarta(int idJugador, int iCarta) throws RemoteException {
 		Carta cartaJugador = jugadores.get(idJugador).getCarta(iCarta);
 		if (cartaJugador.esJugadaValida(this.pozoDescarte)) {
-			cartaJugador.aplicarEfecto(this, idJugador);
-			this.getJugador(idJugador).jugarCarta(iCarta);
 			this.pozoDescarte.agregar(cartaJugador);
-			this.manejadorTurnos.siguienteTurno();
-			notificarObservadores(Eventos.CAMBIO_TURNO);
+			this.getJugador(idJugador).jugarCarta(iCarta);
+			if (this.getJugador(idJugador).esGanador()) {
+				this.calcularPuntajeFinal(idJugador);
+				this.notificarObservadores(Eventos.GANADOR);
+				return true;
+			}
+			cartaJugador.aplicarEfecto(this, idJugador);
+//			this.manejadorTurnos.siguienteTurno();
+//			this.notificarObservadores(Eventos.CAMBIO_TURNO);
+			return true;
 		} else {
-			notificarObservadores(Eventos.CARTA_INVALIDA);
+			return false;
 		}
 	}
 
+	/**
+	 * Descarta el turno del jugador y pasa al siguiente en el caso de que no haga
+	 * ninguna jugada
+	 * 
+	 * @param idJugador del jugador que descarta el turno
+	 */
 	@Override
-	public void descartarTurno(int idJugador) throws RemoteException { // luego de que el jugador tome una carta y decida pasar el turno
+	public void descartarTurno(int idJugador) throws RemoteException {
 		this.agregarCartasExtra(idJugador);
 		this.manejadorTurnos.siguienteTurno();
 		this.mazoPrincipal.setPuedeRobar(true);
-		notificarObservadores(Eventos.CAMBIO_TURNO);
+		this.notificarObservadores(Eventos.CAMBIO_TURNO);
 	}
-	
+
 	@Override
-	public int calcularPuntajeFinal(int idJugador) throws RemoteException{
+	public void cambiarColorPartida(Colores color) throws RemoteException {
+		this.getPozoDescarte().setColorPartida(color);
+		this.getManejadorTurnos().siguienteTurno();
+		this.notificarObservadores(Eventos.CAMBIO_TURNO);
+	}
+
+	@Override
+	public int calcularPuntajeFinal(int idJugador) throws RemoteException {
 		int puntos = 0;
 		for (Jugador j : jugadores) {
 			for (Carta c : j.getMano()) {
@@ -99,7 +162,7 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable{
 				if (c.esComodin() && c.tieneColor()) // CambioDireccion, Roba2, SaltoTurno,
 					puntos += 20;
 				if (!c.esComodin()) { // Normal
-					CartaNormal cn = (CartaNormal) c; 
+					CartaNormal cn = (CartaNormal) c;
 					puntos += cn.getNumero();
 				}
 			}
@@ -109,40 +172,15 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable{
 	}
 
 	@Override
-	public PozoDescarte getPozoDescarte() throws RemoteException{
-		return pozoDescarte;
-	}
-
-	@Override
-	public ManejadorTurnos getManejadorTurnos() throws RemoteException{
-		return manejadorTurnos;
-	}
-
-	@Override
-	public ArrayList<Jugador> getListaJugadores() throws RemoteException{
-		return this.jugadores;
-	}
-
-	@Override
-	public MazoPrincipal getMazoPrincipal() throws RemoteException{
-		return this.mazoPrincipal;
-	}
-
-	@Override
-	public String imprimirListaJugadores() throws RemoteException{
+	public String imprimirListaJugadores() throws RemoteException {
 		String s = "";
-		for (Jugador j : this.getListaJugadores())
+		for (Jugador j : this.getJugadores())
 			s = s + "Jugador " + (j.getId() + 1) + " : " + j.getNombre() + "\n";
 		return s;
 	}
 
 	@Override
-	public Jugador getJugador(int i) throws RemoteException{
-		return jugadores.get(i);
-	}
-
-	@Override
-	public String imprimirTablaPuntuaciones() throws RemoteException{
+	public String imprimirTablaPuntuaciones() throws RemoteException {
 		String s = "";
 		if (this.jugadores.size() > 0) {
 			s = s + "NOMBRE -- PUNTUACION\n";
@@ -153,17 +191,26 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable{
 		return s;
 	}
 
-	// Metodos de Observable viejos
-//	@Override
-//	public void notificar(Eventos evento) throws Exception {
-//		for (Observador observador : this.observadores)
-//			observador.actualizar(evento, this);
-//	}
+	// Getters y Setters
 
-//	@Override
-//	public void agregarObservador(Observador observador) {
-//		this.observadores.add(observador);
-//
-//	}
+	@Override
+	public PozoDescarte getPozoDescarte() throws RemoteException {
+		return pozoDescarte;
+	}
+
+	@Override
+	public ManejadorTurnos getManejadorTurnos() throws RemoteException {
+		return manejadorTurnos;
+	}
+
+	@Override
+	public ArrayList<Jugador> getJugadores() throws RemoteException {
+		return this.jugadores;
+	}
+
+	@Override
+	public MazoPrincipal getMazoPrincipal() throws RemoteException {
+		return this.mazoPrincipal;
+	}
 
 }
