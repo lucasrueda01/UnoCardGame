@@ -7,6 +7,11 @@ import javax.swing.SwingUtilities;
 
 import ar.edu.unlu.uno.controlador.Controlador;
 import ar.edu.unlu.uno.vista.IVista;
+import ar.edu.unlu.uno.vista.VistaGrafica.Utils.GestorSonido;
+import ar.edu.unlu.uno.vista.VistaGrafica.Ventanas.VentanaCambioColor;
+import ar.edu.unlu.uno.vista.VistaGrafica.Ventanas.VentanaJuego;
+import ar.edu.unlu.uno.vista.VistaGrafica.Ventanas.VentanaMenuPrincipal;
+import ar.edu.unlu.uno.vista.VistaGrafica.Ventanas.VentanaPuntuaciones;
 
 public class VistaGrafica implements IVista {
 
@@ -26,18 +31,21 @@ public class VistaGrafica implements IVista {
 		this.formularioJugador();
 		this.menuPrincipal = new VentanaMenuPrincipal(this);
 		this.puntuaciones = new VentanaPuntuaciones();
-		this.mostrarMenuPrincipal();
+		this.menuPrincipal.setVisible(true);
 		this.juego = new VentanaJuego(this);
 	}
 
 	public void formularioJugador() throws Exception {
-	    String nombre = "";
-	    while (nombre.trim().equals("")) {
+	    String nombre = null;
+	    int opcion;
+	    while (nombre == null || nombre.trim().equals("")) {
 	        nombre = JOptionPane.showInputDialog(null, "Ingrese su nombre:", "Uniendose al servidor", JOptionPane.PLAIN_MESSAGE);
 	        if (nombre == null) {
-	            int confirm = JOptionPane.showConfirmDialog(null, "¿Seguro que deseas salir?", "Confirmar salida", JOptionPane.YES_NO_OPTION);
-	            if (confirm == JOptionPane.YES_OPTION) {
+	            opcion = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Confirmar salida", JOptionPane.YES_NO_OPTION);
+	            if (opcion == JOptionPane.YES_OPTION) {
 	                System.exit(0);
+	            } else {
+	            	nombre = null;
 	            }
 	        }
 	    }
@@ -59,41 +67,74 @@ public class VistaGrafica implements IVista {
 	}
 
 	@Override
-	public void elegirNuevoColor() throws Exception {
-	    if (this.controlador.jugadorTurnoActual().getId() == this.clienteID) {
-	        SwingUtilities.invokeLater(() -> { //Llama al dialog dentro del hilo de ejecucion, sin esto no funciona
-	            try {
-	            	VentanaCambioColor cambioColor = new VentanaCambioColor(this.juego);
-	                this.controlador.cambiarColor(cambioColor.elegirColor());
-	                this.juego.imprimirCartel("Se ha cambiado el color a " + this.controlador.getColorActual());
-	            } catch (Exception e) {
-	                e.printStackTrace();
-	            }
-	        });
-	    } else {
-	        this.juego.imprimirCartel(this.controlador.jugadorTurnoActual().getNombre() + " está eligiendo un color");
-	    }
-	}
-
-
-	@Override
 	public void jugar() throws Exception {
-		this.menuPrincipal.setVisible(false);
-		this.puntuaciones.setVisible(false);
-		this.juego.setVisible(true);
-		this.juego.actualizar();
+		if (this.controlador.haySuficientesJugadores()) {
+			this.menuPrincipal.setVisible(false);
+			this.puntuaciones.setVisible(false);
+			this.juego.setVisible(true);
+			this.juego.actualizar();
+		} else {
+			JOptionPane.showMessageDialog(null, "No hay suficientes jugadores para comenzar la partida", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
-
+	
 	@Override
-	public void mostrarMenuPrincipal() {
-		this.menuPrincipal.setVisible(true);
+	public void elegirNuevoColor() throws Exception {
+		if (this.controlador.jugadorTurnoActual().getId() == this.clienteID) {
+			SwingUtilities.invokeLater(() -> { //Llama al dialog dentro del hilo de ejecucion, sin esto no funciona
+				try {
+					String nombre = this.controlador.jugadorTurnoActual().getNombre();
+					VentanaCambioColor cambioColor = new VentanaCambioColor(this.juego);
+					this.controlador.cambiarColor(cambioColor.elegirColor());
+					this.juego.imprimirCartel(nombre + " ha cambiado el color a " + this.controlador.getColorActual().toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+		} else {
+			this.juego.imprimirCartel(this.controlador.jugadorTurnoActual().getNombre() + " esta eligiendo un color");
+		}
 	}
 
 	@Override
 	public void mostrarGanador(int id) throws RemoteException {
-		// TODO Auto-generated method stub
-
+	    String nombreGanador = this.controlador.getJugador(id).getNombre();
+	    int puntos = this.controlador.getJugador(id).getPuntaje();
+	    String mensaje = nombreGanador + " ha ganado con " + puntos + " pts!";
+	    if (id == this.clienteID) {
+	        mensaje = mensaje + "\nFelicidades!";
+	    } else {
+	        mensaje = mensaje + "\nMejor suerte para la próxima!";
+	    }
+	    
+	    final String m = mensaje;
+	    SwingUtilities.invokeLater(() -> { // Llama al diálogo dentro del hilo de ejecución
+	        try {
+	        	GestorSonido sonido = new GestorSonido();
+	        	sonido.cargarSonido("ganador.wav");
+	        	sonido.setVolumen(0.7);
+	        	sonido.reproducir(false);
+	            JOptionPane.showMessageDialog(null, m, "Tenemos ganador!", JOptionPane.INFORMATION_MESSAGE);
+	            this.juego.dispose();
+	            this.controlador.reiniciarJuego();
+	            this.menuPrincipal.setVisible(true);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    });
 	}
+	
+	@Override
+	public void notificarAccion(String string) {
+		this.imprimirCartel(string);
+		
+	}
+	
+	public void salidaJugador() throws RemoteException {
+		this.controlador.salidaJugador(this.clienteID);
+		System.exit(0);
+	}
+
 
 	@Override
 	public void setControlador(Controlador controlador) {
@@ -108,5 +149,7 @@ public class VistaGrafica implements IVista {
 	public int getClienteID() {
 		return clienteID;
 	}
+
+	
 
 }

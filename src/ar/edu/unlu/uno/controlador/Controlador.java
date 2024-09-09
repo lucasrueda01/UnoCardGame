@@ -159,6 +159,22 @@ public class Controlador implements IControladorRemoto {
 		return false;
 	}
 	
+	public void reiniciarJuego() throws RemoteException {
+		try {
+			this.modelo.reiniciarJuego();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void salidaJugador(int clienteID) throws RemoteException{
+		try {
+			this.modelo.salidaJugador(clienteID);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
 	
 	//Metodos de Observer
 	@Override
@@ -166,11 +182,11 @@ public class Controlador implements IControladorRemoto {
 	    try {
 	        switch ((Eventos) cambio) {
 	            case JUGADOR_AGREGADO:
-	                this.vista.imprimirCartel("Jugador " + this.modelo.getJugadores().size() + " se unió!");
+	                this.vista.imprimirCartel("Jugador " + this.modelo.getJugadores().size() + " se unió al servidor!");
 	                break;
 	            case CAMBIO_TURNO:
 	                this.vista.jugar();
-	                this.vista.imprimirCartel("Se ha jugado [" + this.getTopePozo() + "]");
+	                this.vista.notificarAccion("Jugado [" + this.getTopePozo() + "]");
 	                break;
 	            case CAMBIAR_COLOR:
 	                this.vista.elegirNuevoColor();
@@ -191,5 +207,6 @@ public class Controlador implements IControladorRemoto {
 		this.modelo = (IMesa) modeloRemoto;
 	}
 
+	
 
 }

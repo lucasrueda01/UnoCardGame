@@ -35,7 +35,7 @@ public class VistaConsola extends JFrame implements IVista {
 	
 	private void inicializarConsola(int x, int y) {
 		setTitle("UNO");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		setSize(600, 500);
 
@@ -109,7 +109,6 @@ public class VistaConsola extends JFrame implements IVista {
 		switch (opcion) {
 		case "1":
 			if (this.controlador.haySuficientesJugadores()) {
-				this.controlador.notificarComienzo(this.clienteID);
 				this.estado = Estados.JUEGO;
 				this.procesarInput(opcion);
 			} else {
@@ -254,6 +253,10 @@ public class VistaConsola extends JFrame implements IVista {
 		}
 	}
 
+	@Override
+	public void notificarAccion(String string) {
+		// Metodo para la VistaGrafica
+	}
 
 	@Override
 	public void setControlador(Controlador controlador) {
@@ -264,6 +267,8 @@ public class VistaConsola extends JFrame implements IVista {
 	public Controlador getControlador() {
 		return this.controlador;
 	}
+
+
 
 
 

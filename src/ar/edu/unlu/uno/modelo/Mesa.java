@@ -181,6 +181,29 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	    }
 	    return datos; 
 	}
+	
+	@Override
+	public void reiniciarJuego() throws RemoteException {
+	    this.mazoPrincipal = new MazoPrincipal();
+	    this.pozoDescarte = new PozoDescarte();
+	    this.manejadorTurnos = new ManejadorTurnos(jugadores);
+	    this.pozoDescarte.agregar(this.mazoPrincipal.sacar());
+	    for (Jugador j : jugadores) {
+	    	j.reiniciarMano();
+	        this.repartir(j.getId(), cartasIniciales);
+	    }
+	}
+	
+	@Override
+	public void salidaJugador(int id) throws RemoteException {
+		this.jugadores.remove(id);
+		if (this.jugadores.size() == 1) {
+			int ganador = this.jugadores.get(0).getId();
+			this.calcularPuntajeFinal(ganador);
+			this.manejadorTurnos.setTurnoActual(ganador);
+			this.notificarObservadores(Eventos.GANADOR);
+		}
+	}
 
 
 	// Getters y Setters

@@ -16,7 +16,7 @@ public class Jugador implements Serializable {
 		nombre = nombre.substring(0, 1).toUpperCase() + nombre.substring(1).toLowerCase();
 		this.setNombre(nombre);
 		this.id = id;
-		mano = new ArrayList<Carta>();
+		this.mano = new ArrayList<Carta>();
 		this.puntaje = 0;
 	}
 
@@ -41,6 +41,10 @@ public class Jugador implements Serializable {
 
 	public boolean esGanador() {
 		return this.mano.size() == 0;
+	}
+	
+	public void reiniciarMano() {
+		this.mano = new ArrayList<Carta>();
 	}
 
 	// Getters y Setters
