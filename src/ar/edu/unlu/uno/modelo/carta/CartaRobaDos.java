@@ -30,7 +30,7 @@ public class CartaRobaDos extends Carta {
 	}
 
 	@Override
-	public String nombre() {
+	public String tipo() {
 		return "ROBA 2";
 	}
 	

@@ -7,6 +7,7 @@ import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import ar.edu.unlu.uno.modelo.Colores;
 import ar.edu.unlu.uno.modelo.Eventos;
 import ar.edu.unlu.uno.modelo.Jugador;
+import ar.edu.unlu.uno.modelo.carta.Carta;
 import ar.edu.unlu.uno.modelo.IMesa;
 import ar.edu.unlu.uno.vista.IVista;
 
@@ -25,7 +26,6 @@ public class Controlador implements IControladorRemoto {
 			e.printStackTrace();
 			return false;
 		}
-
 	}
 
 	public int agregarJugador(String nombre) throws Exception {
@@ -36,11 +36,11 @@ public class Controlador implements IControladorRemoto {
 			return -1;
 		}
 	}
-
-	public String imprimirPuntajes() throws RemoteException {
+	
+	public Object[][] getTablaJugadores() throws RemoteException {
 		try {
-			return this.modelo.imprimirTablaPuntuaciones();
-		} catch (Exception e) {
+			return this.modelo.getTablaJugadores();
+		} catch (RemoteException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -49,15 +49,6 @@ public class Controlador implements IControladorRemoto {
 	public Jugador jugadorTurnoActual() throws Exception {
 		try {
 			return this.modelo.getJugador(this.modelo.getManejadorTurnos().getTurnoActual());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public String mostrarManoJugador() throws Exception {
-		try {
-			return this.jugadorTurnoActual().mostrarMano();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -100,9 +91,9 @@ public class Controlador implements IControladorRemoto {
 		}
 	}
 
-	public int tamañoManoJugador() throws RemoteException, Exception {
+	public int tamañoManoJugador(int id) throws RemoteException, Exception {
 		try {
-			return this.jugadorTurnoActual().getMano().size();
+			return this.modelo.getJugador(id).getMano().size();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -126,7 +117,7 @@ public class Controlador implements IControladorRemoto {
 		}
 	}
 
-	public void descartarTurno(int idJugador) throws Exception {
+	public void descartarTurno(int idJugador) throws RemoteException {
 		try {
 			this.modelo.descartarTurno(idJugador);
 		} catch (Exception e) {
@@ -151,12 +142,21 @@ public class Controlador implements IControladorRemoto {
 		}
 	}
 
-	public void cambiarColor(Colores color) throws Exception {
+	public void cambiarColor(Colores color) throws RemoteException {
 		try {
 			this.modelo.cambiarColorPartida(color);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean esJugadaValida(Carta cartaJugador) throws RemoteException {
+		try {
+			return cartaJugador.esJugadaValida(this.modelo.getPozoDescarte());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	
@@ -166,11 +166,11 @@ public class Controlador implements IControladorRemoto {
 	    try {
 	        switch ((Eventos) cambio) {
 	            case JUGADOR_AGREGADO:
-	            	String cartel = "-Jugador " + this.modelo.getJugadores().size() + " se unió!-";
-	                this.vista.imprimirCartel(cartel);
+	                this.vista.imprimirCartel("Jugador " + this.modelo.getJugadores().size() + " se unió!");
 	                break;
 	            case CAMBIO_TURNO:
 	                this.vista.jugar();
+	                this.vista.imprimirCartel("Se ha jugado [" + this.getTopePozo() + "]");
 	                break;
 	            case CAMBIAR_COLOR:
 	                this.vista.elegirNuevoColor();

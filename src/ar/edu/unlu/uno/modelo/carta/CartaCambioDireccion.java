@@ -33,7 +33,7 @@ public class CartaCambioDireccion extends Carta {
 	}
 
 	@Override
-	public String nombre() {
+	public String tipo() {
 		return "CAMBIO SENTIDO";
 	}
 

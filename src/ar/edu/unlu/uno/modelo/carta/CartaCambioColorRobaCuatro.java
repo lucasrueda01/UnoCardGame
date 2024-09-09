@@ -33,7 +33,7 @@ public class CartaCambioColorRobaCuatro extends Carta {
 	}
 
 	@Override
-	public String nombre() {
+	public String tipo() {
 		return "CAMBIO COLOR ROBA 4";
 	}
 	

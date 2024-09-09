@@ -30,7 +30,7 @@ public abstract class Carta implements Serializable{
 		if (!pozo.verTope().tieneColor() && this.color.equals(pozo.getColorPartida())) 
 			return true;
 		//Si es del mismo tipo o color
-		if (this.nombre().equals(pozo.verTope().nombre()) || this.color.equals(pozo.getColorPartida())) 
+		if (this.tipo().equals(pozo.verTope().tipo()) || this.color.equals(pozo.getColorPartida())) 
 			return true;
 		return false;
 	}
@@ -45,15 +45,14 @@ public abstract class Carta implements Serializable{
 		return (this.color != Colores.SIN_COLOR);
 	}
 	
-	public abstract String nombre();
+	public abstract String tipo();
 	
-	@Override
 	public String toString() {
 		String s;
 		if (this.color != Colores.SIN_COLOR) 
-			s = this.nombre() + " - " + color.getValor();
+			s = this.tipo() + " - " + color.getValor();
 		else
-			s = this.nombre();
+			s = this.tipo();
 		return s;
 	}
 	

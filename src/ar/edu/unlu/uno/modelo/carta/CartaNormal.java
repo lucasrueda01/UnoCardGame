@@ -54,7 +54,7 @@ public class CartaNormal extends Carta {
 	}
 
 	@Override
-	public String nombre() {
+	public String tipo() {
 		return String.valueOf(this.numero);
 	}
 	

@@ -25,7 +25,15 @@ public class VistaConsola extends JFrame implements IVista {
 	private Controlador controlador;
 	private Estados estado;
 
-	public VistaConsola(int x, int y) {
+	public VistaConsola(int x, int y) throws RemoteException, Exception {
+		Controlador controlador = new Controlador(this);
+		this.setControlador(controlador);
+		this.inicializarConsola(x, y);
+		this.iniciar();
+	}
+	
+	
+	private void inicializarConsola(int x, int y) {
 		setTitle("UNO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
@@ -44,7 +52,7 @@ public class VistaConsola extends JFrame implements IVista {
 					if (!inputText.trim().equals(""))
 						procesarInput(inputText.trim());
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					System.err.print("Error en el input. Solo puede ingresar valores numericos\n");
 				}
 				inputField.setText("");
 			}
@@ -53,16 +61,15 @@ public class VistaConsola extends JFrame implements IVista {
 		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
 		getContentPane().add(inputField, BorderLayout.SOUTH);
 		setLocation(x, y);
-		setVisible(true);
-		this.estado = Estados.AGREGAR_JUGADOR;
-		this.iniciar();
 	}
 
 	@Override
-	public void iniciar() {
+	public void iniciar() throws Exception {
+		setVisible(true);
+		this.estado = Estados.AGREGAR_JUGADOR;
 		this.formularioJugador();
 	}
-
+	
 	private void procesarInput(String inputText) throws Exception {
 		switch (estado) {
 		case MENU_PRINCIPAL:
@@ -130,7 +137,8 @@ public class VistaConsola extends JFrame implements IVista {
 				+ "Selecciona una opcion:\n" + "1. Comenzar UNO\n" + "2. Tabla de puntuaciones\n" + "0. Salir\n");
 	}
 
-	public void formularioJugador() {
+	@Override
+	public void formularioJugador() throws Exception {
 		textArea.setText("Ingrese su nombre: ");
 	}
 
@@ -139,7 +147,7 @@ public class VistaConsola extends JFrame implements IVista {
 		int IDjugador = this.controlador.jugadorTurnoActual().getId();
 		if (IDjugador == this.clienteID) {
 			inputField.setEnabled(true);
-			textArea.setText(this.controlador.mostrarManoJugador());
+			textArea.setText(this.mostrarManoJugador());
 			if (this.controlador.getCartasExtra() == 0) {
 				if (this.controlador.puedeRobar())
 					this.imprimirCartel("0. SACAR CARTA DEL MAZO");
@@ -165,7 +173,7 @@ public class VistaConsola extends JFrame implements IVista {
 		int IDjugador = this.controlador.jugadorTurnoActual().getId();
 		if (IDjugador == this.clienteID) {
 			int numero = Integer.parseInt(inputText);
-			if ((numero >= 1) && (numero <= this.controlador.tamañoManoJugador())) {
+			if ((numero >= 1) && (numero <= this.controlador.tamañoManoJugador(this.clienteID))) {
 				if (!this.controlador.descartarCarta(IDjugador, numero - 1)) {
 					this.imprimirCartel("-ERROR... Carta incompatible-");
 					return;
@@ -193,18 +201,42 @@ public class VistaConsola extends JFrame implements IVista {
 		}
 	}
 
+	@Override
 	public void mostrarTablaPuntuaciones() throws RemoteException {
-		textArea.setText(this.controlador.imprimirPuntajes());
+		textArea.setText(this.imprimirTablaPuntuaciones());
 		this.imprimirCartel("0. VOLVER");
 	}
 
 	public void mostrarGanador(int IDjugador) throws RemoteException {
 		inputField.setEnabled(true);
 		this.estado = Estados.GANADOR;
-		textArea.setText(this.controlador.getJugador(IDjugador).getNombre() + " ha ganado con "
-				+ this.controlador.getJugador(IDjugador).getPuntaje() + " puntos! Felicidades!!");
+		textArea.setText(this.controlador.getJugador(IDjugador).getNombre() + " ha ganado con " + this.controlador.getJugador(IDjugador).getPuntaje() + " puntos! Felicidades!!");
 		this.imprimirCartel("0. VOLVER");
 	}
+	
+	private String imprimirTablaPuntuaciones() throws RemoteException {
+		StringBuilder sb = new StringBuilder();
+		if (this.controlador.haySuficientesJugadores()) {
+		    Object[][] tabla = this.controlador.getTablaJugadores();
+		    // Encabezados de la tabla
+		    sb.append(String.format("%-5s %-15s %-10s%n", "ID", "Nombre", "Puntaje"));
+		    sb.append("------------------------------------\n");
+		    // Iterar sobre la tabla y formatear cada fila
+		    for (Object[] fila : tabla) 
+		        sb.append(String.format("%-5s %-15s %-10s%n", fila[0], fila[1], fila[2]));
+		} else
+			sb.append("No hay jugadores...");
+		return sb.toString();
+	}
+	
+	private String mostrarManoJugador() throws Exception {
+		String s = "-------------------------Mano de " + this.controlador.jugadorTurnoActual().getNombre() + "----------------------------\n";
+		for (int i = 0; i < this.controlador.tamañoManoJugador(this.clienteID); i++)
+			s = s + ((i + 1) + ". [" + this.controlador.jugadorTurnoActual().getCarta(i) + "]\n");
+		s = s + "------------------------------------------------------------------------------------";
+		return s;
+	}
+
 
 	@Override
 	public void imprimirCartel(String s) {
@@ -222,22 +254,18 @@ public class VistaConsola extends JFrame implements IVista {
 		}
 	}
 
-	@Override
-	public void mostrar(String s) {
-		textArea.append("\n" + s);
-	}
 
 	@Override
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
 	}
-
-	public void setEstado(Estados estado) {
-		this.estado = estado;
+	
+	@Override
+	public Controlador getControlador() {
+		return this.controlador;
 	}
 
-	public Estados getEstado() {
-		return this.estado;
-	}
+
+
 
 }

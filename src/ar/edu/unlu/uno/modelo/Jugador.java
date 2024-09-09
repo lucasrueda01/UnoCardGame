@@ -13,6 +13,7 @@ public class Jugador implements Serializable {
 	private int puntaje;
 
 	public Jugador(String nombre, int id) {
+		nombre = nombre.substring(0, 1).toUpperCase() + nombre.substring(1).toLowerCase();
 		this.setNombre(nombre);
 		this.id = id;
 		mano = new ArrayList<Carta>();
@@ -36,14 +37,6 @@ public class Jugador implements Serializable {
 
 	public void sumarPuntos(int puntos) {
 		this.puntaje += puntos;
-	}
-
-	public String mostrarMano() {
-		String s = "-------------------------Mano de " + this.nombre + "----------------------------\n";
-		for (int i = 0; i < this.mano.size(); i++)
-			s = s + ((i + 1) + ". [" + this.getCarta(i) + "]\n");
-		s = s + "------------------------------------------------------------------------------------";
-		return s;
 	}
 
 	public boolean esGanador() {

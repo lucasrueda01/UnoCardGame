@@ -123,8 +123,6 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 				return true;
 			}
 			cartaJugador.aplicarEfecto(this, idJugador);
-//			this.manejadorTurnos.siguienteTurno();
-//			this.notificarObservadores(Eventos.CAMBIO_TURNO);
 			return true;
 		} else {
 			return false;
@@ -170,26 +168,20 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 		this.jugadores.get(idJugador).sumarPuntos(puntos);
 		return puntos;
 	}
-
+	
 	@Override
-	public String imprimirListaJugadores() throws RemoteException {
-		String s = "";
-		for (Jugador j : this.getJugadores())
-			s = s + "Jugador " + (j.getId() + 1) + " : " + j.getNombre() + "\n";
-		return s;
+	public Object[][] getTablaJugadores() {
+	    Object[][] datos = new Object[jugadores.size()][3]; // 3 columnas: ID, Nombre, Puntaje
+	    int i = 0;
+	    for (Jugador j : jugadores) {
+	        datos[i][0] = j.getId() + 1;  
+	        datos[i][1] = j.getNombre();    
+	        datos[i][2] = j.getPuntaje();  
+	        i++; 
+	    }
+	    return datos; 
 	}
 
-	@Override
-	public String imprimirTablaPuntuaciones() throws RemoteException {
-		String s = "";
-		if (this.jugadores.size() > 0) {
-			s = s + "NOMBRE -- PUNTUACION\n";
-			for (Jugador j : jugadores)
-				s = s + j.getNombre() + " ------- " + j.getPuntaje() + "pts.\n";
-		} else
-			s = s + "No hay jugadores...";
-		return s;
-	}
 
 	// Getters y Setters
 

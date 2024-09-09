@@ -32,7 +32,7 @@ public class CartaSaltoTurno extends Carta {
 	}
 
 	@Override
-	public String nombre() {
+	public String tipo() {
 		return "SALTEA TURNO";
 	}
 

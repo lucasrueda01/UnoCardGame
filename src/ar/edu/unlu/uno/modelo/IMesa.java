@@ -31,15 +31,13 @@ public interface IMesa extends IObservableRemoto{
 
 	MazoPrincipal getMazoPrincipal() throws RemoteException;
 
-	String imprimirListaJugadores() throws RemoteException;
-
 	Jugador getJugador(int i) throws RemoteException;
-
-	String imprimirTablaPuntuaciones() throws RemoteException;
 	
 	void cambiarColorPartida(Colores color) throws RemoteException;
 
 	void comenzarJuego(int idJugador) throws RemoteException;
+
+	Object[][] getTablaJugadores() throws RemoteException;
 
 
 }

@@ -11,6 +11,7 @@ import ar.edu.unlu.rmimvc.cliente.Cliente;
 import ar.edu.unlu.uno.controlador.Controlador;
 import ar.edu.unlu.uno.vista.IVista;
 import ar.edu.unlu.uno.vista.VistaConsola.VistaConsola;
+import ar.edu.unlu.uno.vista.VistaGrafica.VistaGrafica;
 
 public class AppCliente {
 
@@ -53,15 +54,15 @@ public class AppCliente {
 		String ip = "127.0.0.1";
 		String ipServidor = "127.0.0.1";
 		String portServidor = "8888";
-		//
-		IVista vista = new VistaConsola(x, y);
-		Controlador controlador = new Controlador(vista);
-		vista.setControlador(controlador);
+		// PARA PRUEBAS
+		
 		Cliente c = new Cliente(ip, Integer.parseInt(port), ipServidor, Integer.parseInt(portServidor));
-		vista.iniciar();
+//		IVista vista = new VistaConsola(x, y);
+		IVista vista = new VistaGrafica();
 		try {
-			c.iniciar(controlador);
+			c.iniciar(vista.getControlador());
 			System.out.println("Cliente corriendo con exito en " + "(" + ip + ":" + port + ")");
+			vista.iniciar();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
