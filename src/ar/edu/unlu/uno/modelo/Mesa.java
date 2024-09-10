@@ -50,7 +50,7 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 		this.getManejadorTurnos().setTurnoActual(idJugador);
 		this.notificarObservadores(Eventos.CAMBIO_TURNO);
 	}
-
+	
 	/**
 	 * Reparte N cantidad de cartas a un Jugador
 	 *
@@ -192,17 +192,6 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	    	j.reiniciarMano();
 	        this.repartir(j.getId(), cartasIniciales);
 	    }
-	}
-	
-	@Override
-	public void salidaJugador(int id) throws RemoteException {
-		this.jugadores.remove(id);
-		if (this.jugadores.size() == 1) {
-			int ganador = this.jugadores.get(0).getId();
-			this.calcularPuntajeFinal(ganador);
-			this.manejadorTurnos.setTurnoActual(ganador);
-			this.notificarObservadores(Eventos.GANADOR);
-		}
 	}
 
 

@@ -166,14 +166,6 @@ public class Controlador implements IControladorRemoto {
 			e.printStackTrace();
 		}
 	}
-	
-	public void salidaJugador(int clienteID) throws RemoteException{
-		try {
-			this.modelo.salidaJugador(clienteID);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
 
 	
 	//Metodos de Observer

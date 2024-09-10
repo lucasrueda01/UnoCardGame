@@ -41,6 +41,4 @@ public interface IMesa extends IObservableRemoto{
 
 	void reiniciarJuego() throws RemoteException;
 
-	void salidaJugador(int id) throws RemoteException;
-
 }

@@ -127,14 +127,7 @@ public class VistaGrafica implements IVista {
 	@Override
 	public void notificarAccion(String string) {
 		this.imprimirCartel(string);
-		
 	}
-	
-	public void salidaJugador() throws RemoteException {
-		this.controlador.salidaJugador(this.clienteID);
-		System.exit(0);
-	}
-
 
 	@Override
 	public void setControlador(Controlador controlador) {

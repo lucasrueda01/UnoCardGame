@@ -25,15 +25,14 @@ public class VistaConsola extends JFrame implements IVista {
 	private Controlador controlador;
 	private Estados estado;
 
-	public VistaConsola(int x, int y) throws RemoteException, Exception {
+	public VistaConsola() throws RemoteException, Exception {
 		Controlador controlador = new Controlador(this);
 		this.setControlador(controlador);
-		this.inicializarConsola(x, y);
+		this.inicializarConsola();
 		this.iniciar();
 	}
 	
-	
-	private void inicializarConsola(int x, int y) {
+	private void inicializarConsola() {
 		setTitle("UNO");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
@@ -60,7 +59,6 @@ public class VistaConsola extends JFrame implements IVista {
 
 		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
 		getContentPane().add(inputField, BorderLayout.SOUTH);
-		setLocation(x, y);
 	}
 
 	@Override

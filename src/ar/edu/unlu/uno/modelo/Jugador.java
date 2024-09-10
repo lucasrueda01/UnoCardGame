@@ -11,7 +11,7 @@ public class Jugador implements Serializable {
 	private int id;
 	private ArrayList<Carta> mano;
 	private int puntaje;
-
+	
 	public Jugador(String nombre, int id) {
 		nombre = nombre.substring(0, 1).toUpperCase() + nombre.substring(1).toLowerCase();
 		this.setNombre(nombre);
