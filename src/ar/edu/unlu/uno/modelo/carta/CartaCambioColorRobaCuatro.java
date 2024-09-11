@@ -29,7 +29,8 @@ public class CartaCambioColorRobaCuatro extends Carta {
 		mesa.getPozoDescarte().agregarCartasExtra(4);
 		//Acumulo cartas extras por ende el siguiente turno no podra robar del mazo
 		mesa.getMazoPrincipal().setPuedeRobar(false); 
-		mesa.notificarObservadores(Eventos.CAMBIAR_COLOR);
+		Object[] array = {Eventos.CAMBIAR_COLOR};
+		mesa.notificarObservadores(array);
 	}
 
 	@Override

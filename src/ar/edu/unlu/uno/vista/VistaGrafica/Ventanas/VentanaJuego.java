@@ -64,9 +64,6 @@ public class VentanaJuego extends JFrame {
 		this.gestorSonido.cargarSonido("juego.wav");
         this.gestorSonido.setVolumen(0.7);
 		this.inicializarComponentes();
-		this.cargarMesa();
-		this.cargarCartasJugador();
-		this.cargarJugadores();
 	}
 
 	private void inicializarComponentes() throws RemoteException {
@@ -75,7 +72,7 @@ public class VentanaJuego extends JFrame {
 		String nombreJugador = this.vista.getControlador().getJugador(this.vista.getClienteID()).getNombre();
 		setTitle("UNO - Juego en progreso - " + nombreJugador);
 		setSize(1200, 620);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 
@@ -259,15 +256,15 @@ public class VentanaJuego extends JFrame {
 		for (Object[] jugador : datosJugadores) {
 			int idJugador = (int) jugador[0];
 			String nombreJugador = (String) jugador[1];
-
-			JLabel labelJugador = new JLabel("J" + idJugador + " - " + nombreJugador);
+			
+			JLabel labelJugador = new JLabel("J" + (idJugador + 1) + " - " + nombreJugador);
 			labelJugador.setForeground(Color.WHITE);
 			labelJugador.setFont(new Font("Arial", Font.BOLD, 20));
 			labelJugador.setHorizontalAlignment(SwingConstants.CENTER);
 			labelJugador.setVerticalAlignment(SwingConstants.CENTER);
 			labelJugador.setPreferredSize(new Dimension(150, 50));
 
-			if (this.controlador.jugadorTurnoActual().getId() == idJugador - 1)
+			if (this.controlador.jugadorTurnoActual().getId() == idJugador)
 				labelJugador.setBorder(BorderFactory.createLineBorder(Color.RED, 4, true));
 
 			panelJugadores.add(labelJugador);

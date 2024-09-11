@@ -55,7 +55,7 @@ public class VistaGrafica implements IVista {
 	
 	@Override
 	public void mostrarTablaPuntuaciones() throws RemoteException {
-		this.puntuaciones.cargarDatos(this.controlador.getTablaJugadores());
+		this.puntuaciones.cargarDatos(this.controlador.getTablaRanking());
 		this.puntuaciones.setVisible(true);
 	}
 
@@ -71,10 +71,16 @@ public class VistaGrafica implements IVista {
 		if (this.controlador.haySuficientesJugadores()) {
 			this.menuPrincipal.setVisible(false);
 			this.puntuaciones.setVisible(false);
-			this.juego.setVisible(true);
 			this.juego.actualizar();
+			this.juego.setVisible(true);
 		} else {
-			JOptionPane.showMessageDialog(null, "No hay suficientes jugadores para comenzar la partida", "Error", JOptionPane.ERROR_MESSAGE);
+			SwingUtilities.invokeLater(() -> { //Llama al dialog dentro del hilo de ejecucion, sin esto no funciona
+				try {
+					JOptionPane.showMessageDialog(null, "No hay suficientes jugadores para comenzar la partida", "Error", JOptionPane.ERROR_MESSAGE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
 		}
 	}
 	
@@ -83,10 +89,8 @@ public class VistaGrafica implements IVista {
 		if (this.controlador.jugadorTurnoActual().getId() == this.clienteID) {
 			SwingUtilities.invokeLater(() -> { //Llama al dialog dentro del hilo de ejecucion, sin esto no funciona
 				try {
-					String nombre = this.controlador.jugadorTurnoActual().getNombre();
 					VentanaCambioColor cambioColor = new VentanaCambioColor(this.juego);
 					this.controlador.cambiarColor(cambioColor.elegirColor());
-					this.juego.imprimirCartel(nombre + " ha cambiado el color a " + this.controlador.getColorActual().toString());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

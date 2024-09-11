@@ -2,16 +2,21 @@ package ar.edu.unlu.uno.modelo;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
+import ar.edu.unlu.uno.Administradores.AdministradorRanking;
 import ar.edu.unlu.uno.modelo.carta.Carta;
 import ar.edu.unlu.uno.modelo.carta.CartaNormal;
 
 public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private AdministradorRanking admRanking = new AdministradorRanking();
 	
+	private ArrayList<Jugador> ranking;
 	private MazoPrincipal mazoPrincipal;
 	private PozoDescarte pozoDescarte;
 	private ArrayList<Jugador> jugadores; // cada Jugador se identifica por su indice en el array
@@ -20,6 +25,7 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 
 	public Mesa() throws RemoteException {
 		this.jugadores = new ArrayList<Jugador>();
+		this.ranking = this.admRanking.cargarRanking();
 		this.mazoPrincipal = new MazoPrincipal();
 		this.pozoDescarte = new PozoDescarte();
 		this.manejadorTurnos = new ManejadorTurnos(jugadores);
@@ -31,7 +37,8 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 		Jugador j = new Jugador(nombre, jugadores.size());
 		jugadores.add(j);
 		this.repartir(j.getId(), cartasIniciales);
-		this.notificarObservadores(Eventos.JUGADOR_AGREGADO);
+		Object[] array = {Eventos.JUGADOR_AGREGADO, j.getNombre()};
+		this.notificarObservadores(array);
 		return j.getId();
 	}
 
@@ -47,8 +54,11 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	 *
 	 */
 	public void comenzarJuego(int idJugador) throws RemoteException {
-		this.getManejadorTurnos().setTurnoActual(idJugador);
-		this.notificarObservadores(Eventos.CAMBIO_TURNO);
+		if (this.manejadorTurnos.getTurnoActual() == -1 ) { // Si no comenzo
+			this.getManejadorTurnos().setTurnoActual(idJugador);
+			Object[] array = {Eventos.CAMBIO_TURNO};
+			this.notificarObservadores(array);
+		}
 	}
 	
 	/**
@@ -114,15 +124,20 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	@Override
 	public boolean descartarCarta(int idJugador, int iCarta) throws RemoteException {
 		Carta cartaJugador = jugadores.get(idJugador).getCarta(iCarta);
+		String jugador = this.getJugador(idJugador).getNombre();
 		if (cartaJugador.esJugadaValida(this.pozoDescarte)) {
 			this.pozoDescarte.agregar(cartaJugador);
 			this.getJugador(idJugador).jugarCarta(iCarta);
 			if (this.getJugador(idJugador).esGanador()) {
 				this.calcularPuntajeFinal(idJugador);
-				this.notificarObservadores(Eventos.GANADOR);
+				this.ranking.add(this.getJugador(idJugador));
+				Object[] array = {Eventos.GANADOR, idJugador};
+				this.notificarObservadores(array);
 				return true;
 			}
 			cartaJugador.aplicarEfecto(this, idJugador);
+			Object[] array = {Eventos.CARTA_JUGADA, jugador, cartaJugador.toString()};
+			this.notificarObservadores(array);
 			return true;
 		} else {
 			return false;
@@ -137,17 +152,27 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	 */
 	@Override
 	public void descartarTurno(int idJugador) throws RemoteException {
+		String nombreJugador = this.getJugador(idJugador).getNombre(); //consigo el jugador que realiza la accion
 		this.agregarCartasExtra(idJugador);
 		this.manejadorTurnos.siguienteTurno();
 		this.mazoPrincipal.setPuedeRobar(true);
-		this.notificarObservadores(Eventos.CAMBIO_TURNO);
+		Object[] array = {Eventos.CAMBIO_TURNO};
+		this.notificarObservadores(array);
+		
+		Object[] array2 = {Eventos.TURNO_DESCARTADO, nombreJugador};
+		this.notificarObservadores(array2);
 	}
 
 	@Override
 	public void cambiarColorPartida(Colores color) throws RemoteException {
+		String nombreJugador = this.getJugador(this.manejadorTurnos.getTurnoActual()).getNombre(); 
 		this.getPozoDescarte().setColorPartida(color);
 		this.getManejadorTurnos().siguienteTurno();
-		this.notificarObservadores(Eventos.CAMBIO_TURNO);
+		Object[] array = {Eventos.CAMBIO_TURNO};
+		this.notificarObservadores(array);
+		
+		Object[] array2 = {Eventos.COLOR_CAMBIADO, nombreJugador, color.toString()};
+		this.notificarObservadores(array2);
 	}
 
 	@Override
@@ -170,13 +195,27 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	}
 	
 	@Override
-	public Object[][] getTablaJugadores() {
-	    Object[][] datos = new Object[jugadores.size()][3]; // 3 columnas: ID, Nombre, Puntaje
+	public Object[][] getTablaJugadores() throws RemoteException{
+	    Object[][] datos = new Object[this.jugadores.size()][4]; // 4 columnas: ID, Nombre, Puntaje, timestamp
 	    int i = 0;
-	    for (Jugador j : jugadores) {
-	        datos[i][0] = j.getId() + 1;  
-	        datos[i][1] = j.getNombre();    
+	    for (Jugador j : this.jugadores) {
+	    	datos[i][0] = j.getId();
+	        datos[i][1] = j.getNombre();  
 	        datos[i][2] = j.getPuntaje();  
+	        datos[i][3] = j.getCreado();    
+	        i++; 
+	    }
+	    return datos; 
+	}
+	
+	@Override
+	public Object[][] getTablaRanking() throws RemoteException{
+	    Object[][] datos = new Object[this.ranking.size()][3]; // 3 columnas: Nombre, Puntaje, timestamp
+	    int i = 0;
+	    for (Jugador j : this.ranking) {
+	        datos[i][0] = j.getNombre();  
+	        datos[i][1] = j.getPuntaje();  
+	        datos[i][2] = j.getCreado();    
 	        i++; 
 	    }
 	    return datos; 
@@ -192,8 +231,9 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	    	j.reiniciarMano();
 	        this.repartir(j.getId(), cartasIniciales);
 	    }
+	    this.admRanking.guardarRanking(ranking);
 	}
-
+	
 
 	// Getters y Setters
 

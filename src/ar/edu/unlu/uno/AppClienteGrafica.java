@@ -57,7 +57,7 @@ public class AppClienteGrafica {
 //		String port = "9998";
 		
 		Cliente c = new Cliente(ip, Integer.parseInt(port), ipServidor, Integer.parseInt(portServidor));
-//		IVista vista = new VistaConsola(x, y);
+//		IVista vista = new VistaConsola();
 		IVista vista = new VistaGrafica();
 		try {
 			c.iniciar(vista.getControlador());

@@ -34,7 +34,7 @@ public class VistaConsola extends JFrame implements IVista {
 	
 	private void inicializarConsola() {
 		setTitle("UNO");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		setSize(600, 500);
 
@@ -69,16 +69,20 @@ public class VistaConsola extends JFrame implements IVista {
 	}
 	
 	private void procesarInput(String inputText) throws Exception {
+		
 		switch (estado) {
 		case MENU_PRINCIPAL:
+			setTitle("Menú Principal - ");
 			this.menu(inputText);
 			break;
 		case AGREGAR_JUGADOR:
 			this.clienteID = this.controlador.agregarJugador(inputText);
-			setTitle("UNO - " + inputText + " (J" + (this.clienteID + 1) + ")");
 			this.volverAlMenuPrincipal();
 			break;
 		case JUEGO:
+			this.controlador.notificarComienzo(clienteID);
+			String nombreJugador = this.getControlador().getJugador(this.clienteID).getNombre();
+			setTitle("UNO - Juego en progreso - " + nombreJugador);
 			this.jugar();
 			break;
 		case TABLA_PUNTUACIONES:
@@ -131,7 +135,7 @@ public class VistaConsola extends JFrame implements IVista {
 
 	public void mostrarMenuPrincipal() {
 		textArea.setText("###########################  UNO  ###############################\n" + "\n"
-				+ "Selecciona una opcion:\n" + "1. Comenzar UNO\n" + "2. Tabla de puntuaciones\n" + "0. Salir\n");
+				+ "Selecciona una opcion:\n" + "1. Comenzar UNO\n" + "2. Ranking\n" + "0. Salir\n");
 	}
 
 	@Override
@@ -161,7 +165,8 @@ public class VistaConsola extends JFrame implements IVista {
 			this.imprimirCartel("Elija una opcion ");
 			this.estado = Estados.ESPERANDO_JUGADA;
 		} else {
-			textArea.setText("Esperando Turno...");
+			String nombre = this.controlador.getJugador(IDjugador).getNombre();
+			textArea.setText("Turno de " + nombre + ". Esperando...");
 			inputField.setEnabled(false);
 		}
 	}
@@ -213,16 +218,11 @@ public class VistaConsola extends JFrame implements IVista {
 	
 	private String imprimirTablaPuntuaciones() throws RemoteException {
 		StringBuilder sb = new StringBuilder();
-		if (this.controlador.haySuficientesJugadores()) {
-		    Object[][] tabla = this.controlador.getTablaJugadores();
-		    // Encabezados de la tabla
-		    sb.append(String.format("%-5s %-15s %-10s%n", "ID", "Nombre", "Puntaje"));
-		    sb.append("------------------------------------\n");
-		    // Iterar sobre la tabla y formatear cada fila
-		    for (Object[] fila : tabla) 
-		        sb.append(String.format("%-5s %-15s %-10s%n", fila[0], fila[1], fila[2]));
-		} else
-			sb.append("No hay jugadores...");
+	    Object[][] tabla = this.controlador.getTablaRanking();
+	    sb.append(String.format("%-5s %-15s %-10s%n", "Nombre", "Puntaje", "Creado"));
+	    sb.append("------------------------------------\n");
+	    for (Object[] fila : tabla) 
+	    	sb.append(String.format("%-5s %-15s %-10s%n", fila[0], fila[1], fila[2]));
 		return sb.toString();
 	}
 	
@@ -247,7 +247,7 @@ public class VistaConsola extends JFrame implements IVista {
 			textArea.setText("1. AZUL\n2. ROJO\n3. AMARILLO\n4. VERDE");
 			this.imprimirCartel("Elija un nuevo color: ");
 		} else {
-			this.imprimirCartel("-El jugador esta eligiendo color-");
+			this.imprimirCartel(this.controlador.jugadorTurnoActual().getNombre() + " esta eligiendo un color");
 		}
 	}
 

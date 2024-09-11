@@ -45,6 +45,15 @@ public class Controlador implements IControladorRemoto {
 			return null;
 		}
 	}
+	
+	public Object[][] getTablaRanking() throws RemoteException {
+		try {
+			return this.modelo.getTablaRanking();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public Jugador jugadorTurnoActual() throws Exception {
 		try {
@@ -170,21 +179,42 @@ public class Controlador implements IControladorRemoto {
 	
 	//Metodos de Observer
 	@Override
-	public void actualizar(IObservableRemoto modelo, Object cambio) throws RemoteException {
+	public void actualizar(IObservableRemoto modelo, Object objetos) throws RemoteException {
 	    try {
-	        switch ((Eventos) cambio) {
+	    	Object[] array = (Object[]) objetos;
+	    	Eventos evento = (Eventos) array[0];
+	    	String jugador;
+	    	String carta;
+	        switch (evento) {
 	            case JUGADOR_AGREGADO:
-	                this.vista.imprimirCartel("Jugador " + this.modelo.getJugadores().size() + " se unió al servidor!");
+	            	String nombre = (String) array[1];
+	                this.vista.imprimirCartel(nombre + " se unió al servidor!");
 	                break;
 	            case CAMBIO_TURNO:
-	                this.vista.jugar();
-	                this.vista.notificarAccion("Jugado [" + this.getTopePozo() + "]");
+	            	this.vista.jugar();
 	                break;
 	            case CAMBIAR_COLOR:
 	                this.vista.elegirNuevoColor();
 	                break;
 	            case GANADOR:
-	            	this.vista.mostrarGanador(this.jugadorTurnoActual().getId());
+	            	int id = (int) array[1];
+	            	this.vista.mostrarGanador(id);
+	            	break;
+	            // Eventos para notificar en el panel de acciones de la VistaGrafica
+	            case CARTA_JUGADA:
+	            	jugador = (String) array[1];
+	            	carta = (String) array[2];
+	            	this.vista.notificarAccion(jugador + " jugo " + "[" + carta + "]");
+	            	break;
+	            case TURNO_DESCARTADO:
+	            	jugador = (String) array[1];
+	            	this.vista.notificarAccion(jugador + " ha pasado el turno");
+	            	break;
+	            case COLOR_CAMBIADO:
+	            	jugador = (String) array[1];
+	            	String color = (String) array[2];
+	            	this.vista.notificarAccion(jugador + " ha cambiado el color a " + color);
+	            	break;
 	            default:
 	                break;
 	        }
@@ -198,6 +228,7 @@ public class Controlador implements IControladorRemoto {
 	public <T extends IObservableRemoto> void setModeloRemoto(T modeloRemoto) throws RemoteException {
 		this.modelo = (IMesa) modeloRemoto;
 	}
+
 
 	
 

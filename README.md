@@ -15,6 +15,7 @@ Se proporcionarán dos tipos de interfaces para jugar: una interfaz gráfica y u
 - Juego en red.
 - Interfaz grafica y consola sin cambiar el modelo.
 - Sistema de puntuaciones
+- Ranking persistido para consultar los jugadores con mayor puntaje
 
 ## Diagrama de clases
 

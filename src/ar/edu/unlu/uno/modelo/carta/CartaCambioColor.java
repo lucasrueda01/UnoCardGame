@@ -18,7 +18,8 @@ public class CartaCambioColor extends Carta {
 	@Override
 	public void aplicarEfecto(Mesa mesa, int idJugador) throws RemoteException {
 		mesa.getMazoPrincipal().setPuedeRobar(true);
-		mesa.notificarObservadores(Eventos.CAMBIAR_COLOR);
+		Object[] array = {Eventos.CAMBIAR_COLOR};
+		mesa.notificarObservadores(array);
 	}
 	
 	@Override

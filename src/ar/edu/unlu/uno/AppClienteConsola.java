@@ -55,7 +55,7 @@ public class AppClienteConsola {
 //		String ipServidor = "127.0.0.1";
 //		String portServidor = "8888";
 //		String port = "9999";
-//		
+		
 		Cliente c = new Cliente(ip, Integer.parseInt(port), ipServidor, Integer.parseInt(portServidor));
 		IVista vista = new VistaConsola();
 //		IVista vista = new VistaGrafica();

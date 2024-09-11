@@ -41,7 +41,8 @@ public class CartaNormal extends Carta {
 		mesa.getMazoPrincipal().setPuedeRobar(true);
 		mesa.agregarCartasExtra(idJugador);
 		mesa.getManejadorTurnos().siguienteTurno();
-		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		Object[] array = {Eventos.CAMBIO_TURNO};
+		mesa.notificarObservadores(array);
 	}
 
 	@Override

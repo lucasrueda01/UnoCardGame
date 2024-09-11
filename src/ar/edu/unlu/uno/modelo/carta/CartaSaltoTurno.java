@@ -21,7 +21,8 @@ public class CartaSaltoTurno extends Carta {
 		mesa.getManejadorTurnos().setSalteaTurno(true);
 		mesa.agregarCartasExtra(idJugador);
 		mesa.getManejadorTurnos().siguienteTurno();
-		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		Object[] array = {Eventos.CAMBIO_TURNO};
+		mesa.notificarObservadores(array);
 	}
 
 	@Override

@@ -41,4 +41,6 @@ public interface IMesa extends IObservableRemoto{
 
 	void reiniciarJuego() throws RemoteException;
 
+	Object[][] getTablaRanking() throws RemoteException;
+
 }

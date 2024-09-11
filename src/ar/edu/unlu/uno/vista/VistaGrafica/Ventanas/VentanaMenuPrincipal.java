@@ -42,7 +42,7 @@ public class VentanaMenuPrincipal extends JFrame {
         getContentPane().setLayout(null); 
         setLocationRelativeTo(null);
 
-        JButton btnPuntuaciones = new JButton("Puntuaciones");
+        JButton btnPuntuaciones = new JButton("Ranking");
         btnPuntuaciones.setBounds(182, 201, 120, 30);
         getContentPane().add(btnPuntuaciones);
 
@@ -65,17 +65,17 @@ public class VentanaMenuPrincipal extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
-                gestorSonido.reproducir(true); // Reproducir en bucle
+                gestorSonido.reproducir(true);
             }
 
             @Override
             public void windowDeactivated(WindowEvent e) {
-                gestorSonido.detener(); // Detener el sonido cuando la ventana se oculta o pierde el foco
+                gestorSonido.detener(); 
             }
 
             @Override
             public void windowClosed(WindowEvent e) {
-                gestorSonido.detener(); // Detener el sonido al cerrar la ventana
+                gestorSonido.detener();
             }
         });
 
@@ -84,6 +84,7 @@ public class VentanaMenuPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                	vista.getControlador().notificarComienzo(vista.getClienteID());
                     vista.jugar();  
                 } catch (Exception ex) {
                     ex.printStackTrace();

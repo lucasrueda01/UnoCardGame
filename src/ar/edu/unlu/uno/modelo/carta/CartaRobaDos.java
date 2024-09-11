@@ -21,7 +21,8 @@ public class CartaRobaDos extends Carta {
 		//si hay cartas extras acumuladas el siguiente turno no podra robar del mazo
 		mesa.getMazoPrincipal().setPuedeRobar(false); 
 		mesa.getManejadorTurnos().siguienteTurno();
-		mesa.notificarObservadores(Eventos.CAMBIO_TURNO);
+		Object[] array = {Eventos.CAMBIO_TURNO};
+		mesa.notificarObservadores(array);
 	}
 
 	@Override

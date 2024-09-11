@@ -15,6 +15,7 @@ public class ManejadorTurnos implements Serializable {
 		this.jugadores = jugadores;
 		this.sentidoNormal = true;
 		this.salteaTurno = false;
+		this.turnoActual = -1; // Representa que no comenzo la partida
 	}
 
 	public void cambiarSentido() {
