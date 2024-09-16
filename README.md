@@ -67,3 +67,51 @@ git clone https://github.com/lucasrueda01/UnoCardGame.git
     ![Image](https://res.cloudinary.com/dwybyiio5/image/upload/v1690935647/zqkmhzotkod629if2ubr.png)
 
 3. Repita este ultimo proceso por cada cliente que desee tener en la red.
+
+## Reglas de juego
+
+### Objetivo del Juego
+
+Cada jugador recibe 7 cartas. El objetivo del UNO es ser el primer jugador en quedarse sin cartas.
+
+### Cómo Jugar
+
+En su turno, un jugador puede:
+
+- Jugar una carta que coincida en número, color o símbolo con la carta de la pila de descartes (Izquierda)
+- Robar una carta del mazo (Derecha) si no puede jugar una carta. Tras robar, el jugador puede:
+  - Jugar una carta de su mano, incluida la que acaba de robar si es jugable.
+  - O, si no puede o no quiere jugar, pasar el turno.
+
+## Tipos de Cartas
+
+### Cartas Numéricas
+
+Hay cartas numeradas del 0 al 9 en cuatro colores: rojo, amarillo, verde y azul. Los jugadores deben jugar cartas que coincidan en número, color o tipo con la carta en la cima de la pila de descartes.
+
+### Cartas Comodin
+
+- Carta +2 (Roba Dos): El siguiente jugador debera robar 2 cartas y perder su turno.
+- Carta de Cambio de Color: El jugador que la juegue puede elegir el color de la partida que debera seguirse.
+- Carta +4 (Roba Cuatro) de Cambio de Color: El jugador que la juegue puede elegir el color de la partida que debera seguirse, y el siguiente jugador debera robar 4 cartas y perder su turno.
+- Carta de Salto (Skip): El siguiente jugador perdera su turno.
+- Carta de Reversa (Reverse): Invierte el orden de juego.
+
+A tener en cuenta:
+
+- Las cartas +2 y +4 pueden acumularse. Si un jugador recibe un +2 o +4, puede jugar otra carta del mismo tipo (otro +2 o +4). Si un jugador no juega un +2 o +4 tras una acumulación, deberá robar la cantidad total de cartas acumuladas y perderá su turno.
+
+## Final del Juego
+
+El juego continúa hasta que un jugador se quede sin cartas. Ese jugador gana la partida.
+
+### Puntaje
+
+- Las cartas numeradas valen su valor nominal.
+- Carta +2: 20 puntos
+- Carta Salto: 20 puntos
+- Carta Reversa: 20 puntos
+- Carta Cambio de Color: 50 puntos
+- Carta Cambio de Color +4: 50 puntos
+
+Al final del juego, el ganador obtiene puntos equivalentes a la suma de los valores de las cartas del resto de jugadores. Este puntaje se guardara en un archivo `ranking.dat` que persistira los jugadores con mas puntaje.
