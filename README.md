@@ -19,7 +19,7 @@ Se proporcionarán dos tipos de interfaces para jugar: una interfaz gráfica y u
 
 ## Diagrama de clases
 
-![Image](diagramaDeClases.jpg)
+![Image](diagrama.jpg)
 
 ## Requisitos
 
