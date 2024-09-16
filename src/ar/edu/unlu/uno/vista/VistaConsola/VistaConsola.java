@@ -160,7 +160,7 @@ public class VistaConsola extends JFrame implements IVista {
 			this.imprimirCartel("");
 			this.imprimirCartel("POZO: [" + this.controlador.getTopePozo() + "]");
 			this.imprimirCartel("COLOR: [" + this.controlador.getColorActual().getValor() + "]");
-			this.imprimirCartel("CARTAS EXTRAS ACUMULADAS: " + this.controlador.getCartasExtra());
+			this.imprimirCartel("CARTAS: +" + this.controlador.getCartasExtra());
 			this.imprimirCartel("");
 			this.imprimirCartel("Elija una opcion ");
 			this.estado = Estados.ESPERANDO_JUGADA;

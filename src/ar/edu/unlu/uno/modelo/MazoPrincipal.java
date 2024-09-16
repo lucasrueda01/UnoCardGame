@@ -44,7 +44,6 @@ public class MazoPrincipal extends Pila {
 			pilaCartas.add(new CartaCambioColor(Colores.SIN_COLOR));
 			pilaCartas.add(new CartaCambioColorRobaCuatro(Colores.SIN_COLOR));
 		}
-
 	}
 
 	public void mezclar() {

@@ -21,7 +21,7 @@ public class CartaCambioDireccion extends Carta {
 		mesa.getManejadorTurnos().cambiarSentido();
 		mesa.getMazoPrincipal().setPuedeRobar(true);
 		mesa.getManejadorTurnos().siguienteTurno();
-		Object[] array = {Eventos.CAMBIAR_COLOR};
+		Object[] array = {Eventos.CAMBIO_TURNO};
 		mesa.notificarObservadores(array);
 	}
 

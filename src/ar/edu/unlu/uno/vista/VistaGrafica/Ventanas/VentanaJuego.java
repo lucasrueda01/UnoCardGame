@@ -38,8 +38,10 @@ public class VentanaJuego extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private VistaGrafica vista;
-	private MapeoCartas mapeo;
 	private Controlador controlador;
+	
+	private MapeoCartas mapeo;
+	private GestorSonido gestorSonido;
 
 	private JPanel panelCartasJugador;
 	private JPanel panelMesa;
@@ -49,8 +51,7 @@ public class VentanaJuego extends JFrame {
 	private JLabel labelMazoPrincipal;
 
 	private JButton btnSaltear;
-	
-	private GestorSonido gestorSonido;
+
 
 	private enum ContextoCarta {
 		MAZO_PRINCIPAL, MAZO_JUGADOR
@@ -62,7 +63,7 @@ public class VentanaJuego extends JFrame {
 		this.mapeo = new MapeoCartas();
 		this.gestorSonido = new GestorSonido();
 		this.gestorSonido.cargarSonido("juego.wav");
-        this.gestorSonido.setVolumen(0.7);
+		this.gestorSonido.setVolumen(0.7);
 		this.inicializarComponentes();
 	}
 
@@ -120,32 +121,31 @@ public class VentanaJuego extends JFrame {
 		panelJugadores.setBackground(new Color(94, 31, 15));
 		JScrollPane scrollJugadores = new JScrollPane(panelJugadores);
 		getContentPane().add(scrollJugadores, BorderLayout.WEST);
-		
+
 		addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowActivated(WindowEvent e) {
-                gestorSonido.reproducir(true); 
-            }
+			@Override
+			public void windowActivated(WindowEvent e) {
+				gestorSonido.reproducir(true);
+			}
 
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-                gestorSonido.detener(); 
-            }
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				gestorSonido.detener();
+			}
 
-            @Override
-            public void windowClosing(WindowEvent e) {
+			@Override
+			public void windowClosing(WindowEvent e) {
 //            	vista.salidaJugador();
 				gestorSonido.detener();
-            }
-        });
-		
-	
+			}
+		});
+
 	}
 
 	private void cargarCartasJugador() throws Exception {
 		String nombreCarta;
 		ImageIcon iconCarta;
-		boolean activo;
+		boolean jugable;
 		int clienteID = this.vista.getClienteID();
 		for (int i = 0; i < this.controlador.tamañoManoJugador(clienteID); i++) {
 			nombreCarta = this.controlador.getJugador(clienteID).getCarta(i).toString();
@@ -155,11 +155,10 @@ public class VentanaJuego extends JFrame {
 			labelCarta.putClientProperty("contexto", ContextoCarta.MAZO_JUGADOR);
 			labelCarta.putClientProperty("nombreCarta", nombreCarta);
 			labelCarta.putClientProperty("indice", i);
+			jugable = this.esMiTurno() && this.controlador.esJugadaValida(this.controlador.getJugador(clienteID).getCarta(i));
+			labelCarta.putClientProperty("jugable", jugable);
 			panelCartasJugador.add(labelCarta);
-			activo = this.esMiTurno()
-					&& this.controlador.esJugadaValida(this.controlador.getJugador(clienteID).getCarta(i));
 			labelCarta.addMouseListener(new MouseListener(labelCarta, 2));
-			labelCarta.setEnabled(activo);
 			labelCarta.setToolTipText(nombreCarta);
 		}
 		panelCartasJugador.revalidate();
@@ -190,10 +189,13 @@ public class VentanaJuego extends JFrame {
 
 		// Label de informacion
 		labelInfo = new JLabel();
-		if (this.esMiTurno())
-			labelInfo.setText("SU TURNO");
-		else
-			labelInfo.setText("TURNO DE " + this.controlador.jugadorTurnoActual().getNombre());
+		if (this.esMiTurno()) {
+			labelInfo.setForeground(Color.GREEN); 
+		    labelInfo.setText("TU TURNO");
+		} else {
+			labelInfo.setForeground(Color.WHITE);  
+		    labelInfo.setText("TURNO DE " + this.controlador.jugadorTurnoActual().getNombre().toUpperCase());
+		}
 
 		labelInfo.setForeground(new Color(255, 255, 255));
 		labelInfo.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -256,7 +258,7 @@ public class VentanaJuego extends JFrame {
 		for (Object[] jugador : datosJugadores) {
 			int idJugador = (int) jugador[0];
 			String nombreJugador = (String) jugador[1];
-			
+
 			JLabel labelJugador = new JLabel("J" + (idJugador + 1) + " - " + nombreJugador);
 			labelJugador.setForeground(Color.WHITE);
 			labelJugador.setFont(new Font("Arial", Font.BOLD, 20));
@@ -323,8 +325,14 @@ public class VentanaJuego extends JFrame {
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			if (this.carta.isEnabled()) {
-				Border bordeNegro = BorderFactory.createLineBorder(Color.BLACK, this.anchoBorde);
-				carta.setBorder(bordeNegro);
+				ContextoCarta contexto = (ContextoCarta) carta.getClientProperty("contexto");
+				if ( contexto.equals(ContextoCarta.MAZO_PRINCIPAL) || (contexto.equals(ContextoCarta.MAZO_JUGADOR) && (boolean) carta.getClientProperty("jugable")) ) { 
+					Border borde = BorderFactory.createLineBorder(Color.BLACK, this.anchoBorde);
+					carta.setBorder(borde);
+				} else { // Para las cartas no jugables
+					Border borde = BorderFactory.createLineBorder(Color.RED, this.anchoBorde);
+					carta.setBorder(borde);
+				}
 			}
 		}
 
@@ -335,32 +343,33 @@ public class VentanaJuego extends JFrame {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			ContextoCarta contexto = (ContextoCarta) carta.getClientProperty("contexto");
-			String nombreCarta = (String) carta.getClientProperty("nombreCarta");
-			GestorSonido sonido = new GestorSonido();
-			if (this.carta.isEnabled()) {
-				if (contexto.equals(ContextoCarta.MAZO_JUGADOR)) {
-					int i = (int) carta.getClientProperty("indice");
-					try {
-						sonido.cargarSonido("jugar-carta.wav");
-						sonido.setVolumen(0.7);
-						sonido.reproducir(false);
-						descartarCartaDeMazo(i, nombreCarta);
-					} catch (RemoteException e1) {
-						e1.printStackTrace();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				} else {
-					try {
+			try {
+				ContextoCarta contexto = (ContextoCarta) carta.getClientProperty("contexto");
+				String nombreCarta = (String) carta.getClientProperty("nombreCarta");
+				GestorSonido sonido = new GestorSonido();
+				if (this.carta.isEnabled()) {
+					if (contexto.equals(ContextoCarta.MAZO_JUGADOR)) { //Es carta de jugador
+						int i = (int) carta.getClientProperty("indice");
+						boolean jugable = (boolean) carta.getClientProperty("jugable");
+						if (jugable) {
+							sonido.cargarSonido("jugar-carta.wav");
+							sonido.setVolumen(0.7);
+							sonido.reproducir(false);
+							descartarCartaDeMazo(i, nombreCarta);
+						} else {
+							sonido.cargarSonido("error.wav");
+							sonido.setVolumen(0.7);
+							sonido.reproducir(false);
+						}
+					} else { // Es carta del mazo
 						sonido.cargarSonido("roba-carta.wav");
 						sonido.setVolumen(0.7);
 						sonido.reproducir(false);
 						robarParaJugador();
-					} catch (Exception e1) {
-						e1.printStackTrace();
 					}
 				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 		}
 	}
