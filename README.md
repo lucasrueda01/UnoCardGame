@@ -34,10 +34,10 @@ git clone https://github.com/lucasrueda01/UnoCardGame.git
 ```
 
 - Importa el proyecto a tu IDE
-- Agrega los archivos .jar al build path
-    Click derecho al archivo -> build path -> add to build path
-- Agregar la carpeta resources como source folder
-    Click derecho sobre la carpeta -> build path -> use as source folder
+- Agrega los archivos .jar al build path.
+    - Click derecho al archivo -> build path -> add to build path
+- Agregar la carpeta resources como source folder.
+    - Click derecho sobre la carpeta -> build path -> use as source folder
 
 ## Uso
 
