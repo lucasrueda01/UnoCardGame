@@ -10,5 +10,6 @@ public enum Eventos implements Serializable{
 	CARTA_JUGADA,
 	COLOR_CAMBIADO,
 	TURNO_DESCARTADO,
-	COMIENZO
+	COMIENZO, 
+	SALIR
 }

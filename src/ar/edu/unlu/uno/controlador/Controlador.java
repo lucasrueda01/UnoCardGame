@@ -176,6 +176,9 @@ public class Controlador implements IControladorRemoto {
 		}
 	}
 
+	public void cerrar() throws RemoteException {
+		this.modelo.cerrar();
+	}
 	
 	//Metodos de Observer
 	@Override
@@ -199,6 +202,9 @@ public class Controlador implements IControladorRemoto {
 	            case GANADOR:
 	            	int id = (int) array[1];
 	            	this.vista.mostrarGanador(id);
+	            	break;
+	            case SALIR:
+	            	this.vista.salir();
 	            	break;
 	            // Eventos para notificar en el panel de acciones de la VistaGrafica
 	            case CARTA_JUGADA:
@@ -228,6 +234,7 @@ public class Controlador implements IControladorRemoto {
 	public <T extends IObservableRemoto> void setModeloRemoto(T modeloRemoto) throws RemoteException {
 		this.modelo = (IMesa) modeloRemoto;
 	}
+
 
 
 	

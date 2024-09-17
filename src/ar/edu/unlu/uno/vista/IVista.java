@@ -26,4 +26,6 @@ public interface IVista {
 
 	public void notificarAccion(String string);
 
+	public void salir();
+
 }

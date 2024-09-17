@@ -234,6 +234,11 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	    this.admRanking.guardarRanking(ranking);
 	}
 	
+	@Override
+	public void cerrar() throws RemoteException {
+		Object[] array = {Eventos.SALIR};
+		this.notificarObservadores(array);
+	}
 
 	// Getters y Setters
 
@@ -256,5 +261,8 @@ public class Mesa extends ObservableRemoto implements IMesa, Serializable {
 	public MazoPrincipal getMazoPrincipal() throws RemoteException {
 		return this.mazoPrincipal;
 	}
+
+
+
 
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 
-public interface IMesa extends IObservableRemoto{
+public interface IMesa extends IObservableRemoto {
 
 	int agregarJugador(String nombre) throws RemoteException;
 
@@ -42,5 +42,8 @@ public interface IMesa extends IObservableRemoto{
 	void reiniciarJuego() throws RemoteException;
 
 	Object[][] getTablaRanking() throws RemoteException;
+
+	void cerrar() throws RemoteException;
+
 
 }

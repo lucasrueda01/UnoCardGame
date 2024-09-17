@@ -73,6 +73,17 @@ public class VentanaJuego extends JFrame {
 		String nombreJugador = this.vista.getControlador().getJugador(this.vista.getClienteID()).getNombre();
 		setTitle("UNO - Juego en progreso - " + nombreJugador);
 		setSize(1200, 620);
+		// Llamar a metodo al cerrar
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+					controlador.cerrar();
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+            }
+        });
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		setLocationRelativeTo(null);

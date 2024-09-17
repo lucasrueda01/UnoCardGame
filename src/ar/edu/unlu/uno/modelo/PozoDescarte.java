@@ -1,10 +1,11 @@
 package ar.edu.unlu.uno.modelo;
 
+import java.io.Serializable;
 import java.util.EmptyStackException;
 
 import ar.edu.unlu.uno.modelo.carta.Carta;
 
-public class PozoDescarte extends Pila {
+public class PozoDescarte extends Pila implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Colores colorPartida;

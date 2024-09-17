@@ -1,5 +1,6 @@
 package ar.edu.unlu.uno.modelo.carta;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import ar.edu.unlu.uno.modelo.Colores;
@@ -7,7 +8,7 @@ import ar.edu.unlu.uno.modelo.Eventos;
 import ar.edu.unlu.uno.modelo.Mesa;
 import ar.edu.unlu.uno.modelo.PozoDescarte;
 
-public class CartaCambioColorRobaCuatro extends Carta {
+public class CartaCambioColorRobaCuatro extends Carta implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

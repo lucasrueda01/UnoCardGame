@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
@@ -29,14 +31,24 @@ public class VistaConsola extends JFrame implements IVista {
 		Controlador controlador = new Controlador(this);
 		this.setControlador(controlador);
 		this.inicializarConsola();
-		this.iniciar();
 	}
 	
 	private void inicializarConsola() {
 		setTitle("UNO");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		setSize(600, 500);
+		// Llamar a metodo al cerrar
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+					controlador.cerrar();
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+            }
+        });
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 
 		textArea = new JTextArea();
 		textArea.setEditable(false);
@@ -102,6 +114,11 @@ public class VistaConsola extends JFrame implements IVista {
 		case GANADOR:
 			if (inputText.equals("0"))
 				this.volverAlMenuPrincipal();
+			break;
+		case SALIR:
+			if (inputText.equals("0"))
+				System.exit(0);
+			break;
 		default:
 			break;
 		}
@@ -202,6 +219,8 @@ public class VistaConsola extends JFrame implements IVista {
 			}
 		}
 	}
+	
+	
 
 	@Override
 	public void mostrarTablaPuntuaciones() throws RemoteException {
@@ -252,6 +271,12 @@ public class VistaConsola extends JFrame implements IVista {
 	}
 
 	@Override
+	public void salir() {
+		textArea.setText("Un jugador ha salido. Presiona 0 para salir...");
+		this.estado = Estados.SALIR;
+	}
+	
+	@Override
 	public void notificarAccion(String string) {
 		// Metodo para la VistaGrafica
 	}
@@ -265,6 +290,7 @@ public class VistaConsola extends JFrame implements IVista {
 	public Controlador getControlador() {
 		return this.controlador;
 	}
+
 
 
 

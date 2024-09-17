@@ -69,6 +69,7 @@ public class VistaGrafica implements IVista {
 	@Override
 	public void jugar() throws Exception {
 		if (this.controlador.haySuficientesJugadores()) {
+			this.getControlador().notificarComienzo(this.getClienteID());
 			this.menuPrincipal.setVisible(false);
 			this.puntuaciones.setVisible(false);
 			this.juego.actualizar();
@@ -134,6 +135,19 @@ public class VistaGrafica implements IVista {
 	}
 
 	@Override
+	public void salir() {
+		 SwingUtilities.invokeLater(() -> { // Llama al diálogo dentro del hilo de ejecución
+		        try {
+		        	String msj = "Un jugador ha salido. Saliendo...";
+		            JOptionPane.showMessageDialog(null, msj, "Salir", JOptionPane.INFORMATION_MESSAGE);
+		            System.exit(0);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    });
+	}
+	
+	@Override
 	public void setControlador(Controlador controlador) {
 		this.controlador = controlador;
 	}
@@ -146,6 +160,7 @@ public class VistaGrafica implements IVista {
 	public int getClienteID() {
 		return clienteID;
 	}
+
 
 	
 

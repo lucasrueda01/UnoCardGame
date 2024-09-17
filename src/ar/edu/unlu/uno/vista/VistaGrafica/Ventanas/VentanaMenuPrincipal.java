@@ -84,7 +84,6 @@ public class VentanaMenuPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                	vista.getControlador().notificarComienzo(vista.getClienteID());
                     vista.jugar();  
                 } catch (Exception ex) {
                     ex.printStackTrace();

@@ -1,5 +1,6 @@
 package ar.edu.unlu.uno.modelo;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import ar.edu.unlu.uno.modelo.carta.CartaCambioColor;
@@ -9,7 +10,7 @@ import ar.edu.unlu.uno.modelo.carta.CartaNormal;
 import ar.edu.unlu.uno.modelo.carta.CartaRobaDos;
 import ar.edu.unlu.uno.modelo.carta.CartaSaltoTurno;
 
-public class MazoPrincipal extends Pila {
+public class MazoPrincipal extends Pila implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
