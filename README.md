@@ -43,7 +43,7 @@ git clone https://github.com/lucasrueda01/UnoCardGame.git
 ## Uso
 
 1. Ejecutar el servidor
-    1. Ejecutar la clase AppServidor.java situada en "src/ar/edu/unlu/mancala/rmi/servidor"
+    1. Ejecutar la clase AppServidor.java situada en "src/ar/edu/unlu/uno/AppServidor.java"
     2. Selecciona la IP donde se escucharan las peticiones
 
        ![Image](https://res.cloudinary.com/dwybyiio5/image/upload/v1690935864/imcyz62cvqyejhugfbcg.png)
