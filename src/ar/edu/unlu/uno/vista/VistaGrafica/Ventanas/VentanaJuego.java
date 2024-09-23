@@ -231,6 +231,7 @@ public class VentanaJuego extends JFrame {
 		} else {
 			btnSaltear.setEnabled(false);
 		}
+		
 
 		btnSaltear.addActionListener(new ActionListener() {
 			@Override
@@ -242,7 +243,10 @@ public class VentanaJuego extends JFrame {
 				}
 			}
 		});
-		panelMesa.add(btnSaltear);
+		
+		if (btnSaltear.isEnabled()){
+			panelMesa.add(btnSaltear);
+		}
 
 		// Label Nro de cartas
 		JLabel labelCartasExtras = new JLabel("CARTAS: +" + this.controlador.getCartasExtra());
