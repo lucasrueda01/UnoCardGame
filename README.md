@@ -2,7 +2,9 @@
 
 ![Image](https://i0.wp.com/www.actionfigureinsider.com/wpress/wp-content/uploads/2021/04/UnoBanner.jpg?fit=1721%2C713)
 
-## Introduccion
+[Presentación](https://www.canva.com/design/DAGRshG0JVI/yFrrA2uKWCxPU4zZ4tfUnQ/edit?utm_content=DAGRshG0JVI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+## Introducción
 
 Este proyecto consiste en la implementacion del juego de cartas "Uno" como parte del trabajo final de la materia Programacion Orientada a Objetos de la Universidad Nacional de Lujan. El objetivo es desarrollar una aplicacion que permita a multiples usuarios conectados simultaneamente en tiempo real, poder jugar una partida de Uno, siguiendo debidamente las reglas del mismo.
 En el proyecto se utiliza patrones como MVC y Observer para una mejor organizacion del codigo, ademas de la libreria RMIMVC que provee el equipo docente para la posibilidad de jugar en red.
